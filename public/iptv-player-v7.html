@@ -2091,6 +2091,7 @@
         this.favoritesList = new Map(); // Cache for favorites display
         this.config = {
           server: 'http://c.maintech.top',
+          githubRawUrl: '', // INSIRA AQUI A URL DO GITHUB RAW PARA CARREGAR RÁDIOS EXTRAS
           username: 'IPTVBR',
           password: 'IPTVBR'
         };
@@ -2098,7 +2099,8 @@
         this.init();
       }
 
-      initRadios() {
+      async initRadios() {
+        // Rádios padrão
         this.radios = [
           {
             id: 'jovem_pan',
@@ -2281,6 +2283,53 @@
             letter: 'V'
           }
         ];
+        
+        // NOVA FUNCIONALIDADE: Carregar rádios extras do GitHub RAW
+        await this.loadRadiosFromGitHubRaw();
+      }
+      
+      // NOVA FUNÇÃO: Carregar rádios do GitHub RAW
+      async loadRadiosFromGitHubRaw() {
+        // URL DO GITHUB RAW - INSIRA SUA URL AQUI:
+        const githubRawUrl = this.config.githubRawUrl || '';
+        
+        if (!githubRawUrl) {
+          console.log('URL do GitHub RAW não configurada');
+          return;
+        }
+        
+        try {
+          console.log('Carregando rádios extras do GitHub RAW:', githubRawUrl);
+          const response = await fetch(githubRawUrl);
+          
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          
+          const data = await response.text();
+          
+          // Tentar fazer parsing do JSON
+          let extraRadios;
+          try {
+            extraRadios = JSON.parse(data);
+          } catch (parseError) {
+            console.error('Erro ao fazer parse do JSON:', parseError);
+            return;
+          }
+          
+          // Validar se é um array
+          if (!Array.isArray(extraRadios)) {
+            console.error('O arquivo RAW deve conter um array de rádios');
+            return;
+          }
+          
+          // Adicionar as rádios extras às rádios existentes
+          console.log(`Adicionando ${extraRadios.length} rádios extras`);
+          this.radios = [...this.radios, ...extraRadios];
+          
+        } catch (error) {
+          console.error('Erro ao carregar rádios do GitHub RAW:', error);
+        }
       }
 
       async init() {
@@ -2317,7 +2366,12 @@
               smoothQualityChange: true,
               overrideNative: !videojs.browser.IS_SAFARI
             }
-          }
+          },
+          // MELHORIA DA QUALIDADE DO ÁUDIO
+          audioQuality: 'high',
+          techOrder: ['html5'],
+          sources: [],
+          playbackRates: [0.5, 1, 1.25, 1.5, 2]
         });
 
         this.player.on('timeupdate', () => {
