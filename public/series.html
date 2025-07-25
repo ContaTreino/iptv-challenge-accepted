@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IPTV Player - Séries</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css" rel="stylesheet">
+  <link href="https://vjs.zencdn.net/8.6.1/video-js.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <style>
+    :root {
+      --primary-color: #00A848;
+      --primary-gradient: linear-gradient(135deg, #00A848, #00c851);
+      --bg-primary: #1f1f1f;
+      --bg-secondary: #252525;
+      --bg-tertiary: #303030;
+      --bg-quaternary: #404040;
+      --text-primary: #ffffff;
+      --text-secondary: #9CA3AF;
+      --text-tertiary: #D1D5DB;
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow-x: hidden;
+    }
+
+    .header {
+      background: var(--primary-gradient);
+      padding: 0.75rem 1rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: clamp(1.1rem, 4vw, 1.5rem);
+      font-weight: 700;
+      color: white;
+    }
+
+    .nav-bar {
+      background-color: var(--bg-secondary);
+      padding: 0.5rem 0;
+      border-bottom: 2px solid var(--bg-quaternary);
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .nav-bar::-webkit-scrollbar { display: none; }
+    
+    .nav-links {
+      display: flex;
+      gap: 0.5rem;
+      padding: 0 1rem;
+      min-width: max-content;
+    }
+    
+    .nav-link {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      white-space: nowrap;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+    .nav-link:hover {
+      color: var(--text-tertiary);
+      background: rgba(255,255,255,0.1);
+    }
+    .nav-link.active {
+      color: var(--primary-color);
+      background: rgba(0,168,72,0.1);
+    }
+
+    .video-container {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%;
+      background: #000;
+      overflow: hidden;
+    }
+    #videoPlayer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .content-section {
+      background-color: var(--bg-tertiary);
+      max-height: 60vh;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #555 var(--bg-tertiary);
+    }
+
+    .content-item {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      border-bottom: 1px solid var(--bg-quaternary);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .content-item:hover {
+      background-color: var(--bg-quaternary);
+      transform: translateX(5px);
+    }
+    .content-item.playing {
+      background: linear-gradient(90deg, rgba(0,168,72,0.2), transparent);
+      border-left: 4px solid var(--primary-color);
+    }
+
+    .content-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      background: var(--primary-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 1.2rem;
+      margin-right: 1rem;
+      box-shadow: 0 2px 8px rgba(0,168,72,0.3);
+      background-size: cover;
+      background-position: center;
+    }
+
+    .content-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .content-title {
+      font-weight: 600;
+      font-size: 1rem;
+      margin: 0 0 0.25rem 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .content-category {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-secondary);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 2rem;
+      color: var(--text-secondary);
+    }
+
+    @media (max-width: 768px) {
+      .content-avatar {
+        width: 50px;
+        height: 50px;
+        font-size: 1rem;
+      }
+      .content-item {
+        padding: 0.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header d-flex justify-content-between align-items-center">
+    <h1><i class="fas fa-play-circle"></i> Séries</h1>
+    <button class="btn btn-sm" style="background: rgba(255,255,255,0.2); color: white;" onclick="goHome()">
+      <i class="fas fa-home"></i>
+    </button>
+  </div>
+
+  <div class="nav-bar">
+    <div class="nav-links">
+      <a href="canais.html" class="nav-link">
+        <i class="fas fa-broadcast-tower"></i> Canais
+      </a>
+      <a href="filmes.html" class="nav-link">
+        <i class="fas fa-film"></i> Filmes
+      </a>
+      <a href="series.html" class="nav-link active">
+        <i class="fas fa-play-circle"></i> Séries
+      </a>
+      <a href="radios.html" class="nav-link">
+        <i class="fas fa-radio"></i> Rádios
+      </a>
+    </div>
+  </div>
+
+  <div class="video-container">
+    <video id="videoPlayer" controls></video>
+  </div>
+
+  <div class="content-section" id="seriesList">
+    <div class="loading">
+      <i class="fas fa-spinner fa-spin fa-2x"></i>
+      <p class="mt-2">Carregando séries...</p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    class SeriesPlayer {
+      constructor() {
+        this.cache = JSON.parse(sessionStorage.getItem('iptv-cache')) || {};
+        this.config = this.cache.config;
+        this.series = this.cache.series;
+        this.currentSeries = null;
+        this.videoPlayer = document.getElementById('videoPlayer');
+        
+        if (!this.config) {
+          this.showError('Configuração não encontrada!');
+          return;
+        }
+        
+        this.init();
+      }
+
+      async init() {
+        try {
+          if (!this.series) {
+            await this.loadSeries();
+          } else {
+            this.displaySeries();
+          }
+        } catch (error) {
+          this.showError('Erro ao carregar séries: ' + error.message);
+        }
+      }
+
+      async loadSeries() {
+        try {
+          const response = await fetch(`${this.config.server}/player_api.php?username=${this.config.username}&password=${this.config.password}&action=get_series_categories`);
+          const categories = await response.json();
+          
+          let allSeries = [];
+          for (const category of categories) {
+            const seriesResponse = await fetch(`${this.config.server}/player_api.php?username=${this.config.username}&password=${this.config.password}&action=get_series&category_id=${category.category_id}`);
+            const series = await seriesResponse.json();
+            
+            series.forEach(serie => {
+              serie.category_name = category.category_name;
+            });
+            
+            allSeries = allSeries.concat(series);
+          }
+          
+          this.series = allSeries;
+          this.cache.series = allSeries;
+          sessionStorage.setItem('iptv-cache', JSON.stringify(this.cache));
+          
+          this.displaySeries();
+        } catch (error) {
+          throw new Error('Falha ao carregar séries');
+        }
+      }
+
+      displaySeries() {
+        const container = document.getElementById('seriesList');
+        
+        if (!this.series || this.series.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <i class="fas fa-play-circle fa-3x mb-3"></i>
+              <h4>Nenhuma série encontrada</h4>
+              <p>Verifique sua configuração de playlist</p>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = '';
+        
+        this.series.forEach(serie => {
+          const item = document.createElement('div');
+          item.className = 'content-item';
+          item.innerHTML = `
+            <div class="content-avatar" style="background-image: url('${serie.cover || ''}')">
+              ${!serie.cover ? serie.name.charAt(0).toUpperCase() : ''}
+            </div>
+            <div class="content-info">
+              <div class="content-title">${serie.name}</div>
+              <div class="content-category">${serie.category_name || 'Série'}</div>
+            </div>
+          `;
+          
+          item.addEventListener('click', () => this.showSeriesEpisodes(serie));
+          container.appendChild(item);
+        });
+      }
+
+      async showSeriesEpisodes(serie) {
+        try {
+          const response = await fetch(`${this.config.server}/player_api.php?username=${this.config.username}&password=${this.config.password}&action=get_series_info&series_id=${serie.series_id}`);
+          const seriesInfo = await response.json();
+          
+          const container = document.getElementById('seriesList');
+          container.innerHTML = `
+            <div style="padding: 1rem; background: var(--bg-secondary); border-bottom: 1px solid var(--bg-quaternary);">
+              <button class="btn btn-sm btn-outline-light mb-2" onclick="location.reload()">
+                <i class="fas fa-arrow-left"></i> Voltar às Séries
+              </button>
+              <h5>${serie.name}</h5>
+            </div>
+          `;
+          
+          // Exibir episódios por temporada
+          if (seriesInfo.episodes) {
+            Object.keys(seriesInfo.episodes).forEach(season => {
+              const seasonContainer = document.createElement('div');
+              seasonContainer.innerHTML = `
+                <div style="padding: 0.75rem 1rem; background: var(--bg-quaternary); font-weight: 600;">
+                  Temporada ${season}
+                </div>
+              `;
+              
+              seriesInfo.episodes[season].forEach(episode => {
+                const episodeItem = document.createElement('div');
+                episodeItem.className = 'content-item';
+                episodeItem.innerHTML = `
+                  <div class="content-avatar">
+                    <i class="fas fa-play"></i>
+                  </div>
+                  <div class="content-info">
+                    <div class="content-title">${episode.title}</div>
+                    <div class="content-category">Episódio ${episode.episode_num}</div>
+                  </div>
+                `;
+                
+                episodeItem.addEventListener('click', () => this.playEpisode(episode));
+                seasonContainer.appendChild(episodeItem);
+              });
+              
+              container.appendChild(seasonContainer);
+            });
+          }
+        } catch (error) {
+          this.showError('Erro ao carregar episódios');
+        }
+      }
+
+      playEpisode(episode) {
+        // Remove playing class from all items
+        document.querySelectorAll('.content-item').forEach(item => item.classList.remove('playing'));
+        
+        // Add playing class to current item
+        event.currentTarget.classList.add('playing');
+        
+        const streamUrl = `${this.config.server}/series/${this.config.username}/${this.config.password}/${episode.id}.mp4`;
+        this.loadVideo(streamUrl);
+      }
+
+      loadVideo(url) {
+        this.videoPlayer.src = url;
+        this.videoPlayer.play().catch(error => {
+          console.error('Erro ao reproduzir:', error);
+          this.showError('Erro ao reproduzir episódio');
+        });
+      }
+
+      showError(message) {
+        const container = document.getElementById('seriesList');
+        container.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-exclamation-triangle fa-3x mb-3" style="color: #EF4444;"></i>
+            <h4>Erro</h4>
+            <p>${message}</p>
+            <button class="btn btn-primary mt-3" onclick="location.reload()">
+              <i class="fas fa-refresh"></i> Tentar Novamente
+            </button>
+          </div>
+        `;
+      }
+    }
+
+    function goHome() {
+      window.location.href = 'index.html';
+    }
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', () => {
+      new SeriesPlayer();
+    });
+  </script>
+</body>
+</html>

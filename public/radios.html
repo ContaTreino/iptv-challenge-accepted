@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IPTV Player - Rádios</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css" rel="stylesheet">
+  <link href="https://vjs.zencdn.net/8.6.1/video-js.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <style>
+    :root {
+      --primary-color: #00A848;
+      --primary-gradient: linear-gradient(135deg, #00A848, #00c851);
+      --bg-primary: #1f1f1f;
+      --bg-secondary: #252525;
+      --bg-tertiary: #303030;
+      --bg-quaternary: #404040;
+      --text-primary: #ffffff;
+      --text-secondary: #9CA3AF;
+      --text-tertiary: #D1D5DB;
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow-x: hidden;
+    }
+
+    .header {
+      background: var(--primary-gradient);
+      padding: 0.75rem 1rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: clamp(1.1rem, 4vw, 1.5rem);
+      font-weight: 700;
+      color: white;
+    }
+
+    .nav-bar {
+      background-color: var(--bg-secondary);
+      padding: 0.5rem 0;
+      border-bottom: 2px solid var(--bg-quaternary);
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .nav-bar::-webkit-scrollbar { display: none; }
+    
+    .nav-links {
+      display: flex;
+      gap: 0.5rem;
+      padding: 0 1rem;
+      min-width: max-content;
+    }
+    
+    .nav-link {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      white-space: nowrap;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+    .nav-link:hover {
+      color: var(--text-tertiary);
+      background: rgba(255,255,255,0.1);
+    }
+    .nav-link.active {
+      color: var(--primary-color);
+      background: rgba(0,168,72,0.1);
+    }
+
+    .radio-container {
+      position: relative;
+      width: 100%;
+      height: 400px;
+      background: #000;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .radio-visual-display {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #000000, #1a1a1a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      color: white;
+    }
+
+    .radio-main-image {
+      width: 150px;
+      height: 150px;
+      border-radius: 20px;
+      object-fit: cover;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      border: 3px solid rgba(255,255,255,0.2);
+      animation: radioGlow 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes radioGlow {
+      0% { 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 0 rgba(0,168,72,0.0);
+      }
+      100% { 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(0,168,72,0.3);
+      }
+    }
+
+    .radio-main-info h3 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem 0;
+      text-align: center;
+    }
+
+    .radio-main-info p {
+      font-size: 1.1rem;
+      margin: 0 0 1rem 0;
+      opacity: 0.9;
+      text-align: center;
+    }
+
+    .radio-playing-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(0,168,72,0.2);
+      backdrop-filter: blur(10px);
+      padding: 0.5rem 1rem;
+      border-radius: 25px;
+      border: 1px solid rgba(255,255,255,0.2);
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .radio-playing-indicator i {
+      animation: pulse 2s infinite;
+      color: var(--primary-color);
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+
+    .audio-player {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      background: rgba(0,0,0,0.8);
+      border-radius: 10px;
+      padding: 1rem;
+    }
+
+    .content-section {
+      background-color: var(--bg-tertiary);
+      max-height: 60vh;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #555 var(--bg-tertiary);
+    }
+
+    .content-item {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      border-bottom: 1px solid var(--bg-quaternary);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .content-item:hover {
+      background-color: var(--bg-quaternary);
+      transform: translateX(5px);
+    }
+    .content-item.playing {
+      background: linear-gradient(90deg, rgba(0,168,72,0.2), transparent);
+      border-left: 4px solid var(--primary-color);
+    }
+
+    .content-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      background: var(--primary-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 1.2rem;
+      margin-right: 1rem;
+      box-shadow: 0 2px 8px rgba(0,168,72,0.3);
+      background-size: cover;
+      background-position: center;
+    }
+
+    .content-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .content-title {
+      font-weight: 600;
+      font-size: 1rem;
+      margin: 0 0 0.25rem 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .content-category {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-secondary);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 2rem;
+      color: var(--text-secondary);
+    }
+
+    @media (max-width: 768px) {
+      .content-avatar {
+        width: 50px;
+        height: 50px;
+        font-size: 1rem;
+      }
+      .content-item {
+        padding: 0.75rem;
+      }
+      .radio-main-image {
+        width: 120px;
+        height: 120px;
+      }
+      .radio-main-info h3 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header d-flex justify-content-between align-items-center">
+    <h1><i class="fas fa-radio"></i> Rádios</h1>
+    <button class="btn btn-sm" style="background: rgba(255,255,255,0.2); color: white;" onclick="goHome()">
+      <i class="fas fa-home"></i>
+    </button>
+  </div>
+
+  <div class="nav-bar">
+    <div class="nav-links">
+      <a href="canais.html" class="nav-link">
+        <i class="fas fa-broadcast-tower"></i> Canais
+      </a>
+      <a href="filmes.html" class="nav-link">
+        <i class="fas fa-film"></i> Filmes
+      </a>
+      <a href="series.html" class="nav-link">
+        <i class="fas fa-play-circle"></i> Séries
+      </a>
+      <a href="radios.html" class="nav-link active">
+        <i class="fas fa-radio"></i> Rádios
+      </a>
+    </div>
+  </div>
+
+  <div class="radio-container">
+    <div class="radio-visual-display" id="radioDisplay">
+      <i class="fas fa-radio fa-3x mb-3" style="opacity: 0.7;"></i>
+      <h3>Selecione uma rádio</h3>
+      <p>Escolha uma estação para começar a ouvir</p>
+    </div>
+    <audio id="audioPlayer" class="audio-player" controls style="display: none;"></audio>
+  </div>
+
+  <div class="content-section" id="radiosList">
+    <div class="loading">
+      <i class="fas fa-spinner fa-spin fa-2x"></i>
+      <p class="mt-2">Carregando rádios...</p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    class RadiosPlayer {
+      constructor() {
+        this.cache = JSON.parse(sessionStorage.getItem('iptv-cache')) || {};
+        this.config = this.cache.config;
+        this.radios = this.cache.radios;
+        this.currentRadio = null;
+        this.audioPlayer = document.getElementById('audioPlayer');
+        
+        if (!this.config) {
+          this.showError('Configuração não encontrada!');
+          return;
+        }
+        
+        this.init();
+      }
+
+      async init() {
+        try {
+          if (!this.radios) {
+            await this.loadRadios();
+          } else {
+            this.displayRadios();
+          }
+        } catch (error) {
+          this.showError('Erro ao carregar rádios: ' + error.message);
+        }
+      }
+
+      async loadRadios() {
+        try {
+          // Para rádios, usamos os canais que são do tipo rádio
+          const response = await fetch(`${this.config.server}/player_api.php?username=${this.config.username}&password=${this.config.password}&action=get_live_categories`);
+          const categories = await response.json();
+          
+          let allRadios = [];
+          for (const category of categories) {
+            if (category.category_name.toLowerCase().includes('radio') || 
+                category.category_name.toLowerCase().includes('rádio')) {
+              const radiosResponse = await fetch(`${this.config.server}/player_api.php?username=${this.config.username}&password=${this.config.password}&action=get_live_streams&category_id=${category.category_id}`);
+              const radios = await radiosResponse.json();
+              
+              radios.forEach(radio => {
+                radio.category_name = category.category_name;
+              });
+              
+              allRadios = allRadios.concat(radios);
+            }
+          }
+          
+          this.radios = allRadios;
+          this.cache.radios = allRadios;
+          sessionStorage.setItem('iptv-cache', JSON.stringify(this.cache));
+          
+          this.displayRadios();
+        } catch (error) {
+          throw new Error('Falha ao carregar rádios');
+        }
+      }
+
+      displayRadios() {
+        const container = document.getElementById('radiosList');
+        
+        if (!this.radios || this.radios.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <i class="fas fa-radio fa-3x mb-3"></i>
+              <h4>Nenhuma rádio encontrada</h4>
+              <p>Verifique sua configuração de playlist</p>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = '';
+        
+        this.radios.forEach(radio => {
+          const item = document.createElement('div');
+          item.className = 'content-item';
+          item.innerHTML = `
+            <div class="content-avatar" style="background-image: url('${radio.stream_icon || ''}')">
+              ${!radio.stream_icon ? '<i class="fas fa-radio"></i>' : ''}
+            </div>
+            <div class="content-info">
+              <div class="content-title">${radio.name}</div>
+              <div class="content-category">${radio.category_name || 'Rádio'}</div>
+            </div>
+          `;
+          
+          item.addEventListener('click', () => this.playRadio(radio));
+          container.appendChild(item);
+        });
+      }
+
+      playRadio(radio) {
+        // Remove playing class from all items
+        document.querySelectorAll('.content-item').forEach(item => item.classList.remove('playing'));
+        
+        // Add playing class to current item
+        event.currentTarget.classList.add('playing');
+        
+        this.currentRadio = radio;
+        this.updateRadioDisplay(radio);
+        
+        const streamUrl = `${this.config.server}/live/${this.config.username}/${this.config.password}/${radio.stream_id}.m3u8`;
+        
+        this.loadAudio(streamUrl);
+      }
+
+      updateRadioDisplay(radio) {
+        const display = document.getElementById('radioDisplay');
+        display.innerHTML = `
+          <img src="${radio.stream_icon || '/placeholder.svg'}" 
+               alt="${radio.name}" 
+               class="radio-main-image"
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div style="display: none; width: 150px; height: 150px; border-radius: 20px; background: var(--primary-gradient); align-items: center; justify-content: center; margin-bottom: 1.5rem;">
+            <i class="fas fa-radio fa-3x"></i>
+          </div>
+          <div class="radio-main-info">
+            <h3>${radio.name}</h3>
+            <p>${radio.category_name || 'Rádio Online'}</p>
+            <div class="radio-playing-indicator">
+              <i class="fas fa-volume-up"></i>
+              Tocando Agora
+            </div>
+          </div>
+        `;
+      }
+
+      loadAudio(url) {
+        this.audioPlayer.src = url;
+        this.audioPlayer.style.display = 'block';
+        this.audioPlayer.play().catch(error => {
+          console.error('Erro ao reproduzir:', error);
+          this.showError('Erro ao reproduzir rádio');
+        });
+      }
+
+      showError(message) {
+        const container = document.getElementById('radiosList');
+        container.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-exclamation-triangle fa-3x mb-3" style="color: #EF4444;"></i>
+            <h4>Erro</h4>
+            <p>${message}</p>
+            <button class="btn btn-primary mt-3" onclick="location.reload()">
+              <i class="fas fa-refresh"></i> Tentar Novamente
+            </button>
+          </div>
+        `;
+      }
+    }
+
+    function goHome() {
+      window.location.href = 'index.html';
+    }
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', () => {
+      new RadiosPlayer();
+    });
+  </script>
+</body>
+</html>
