@@ -148,9 +148,29 @@
       height: auto;
       opacity: 0.7;
       z-index: 100;
-      transition: opacity 0.3s ease;
+      transition: all 0.3s ease;
       pointer-events: none;
     }
+    
+    /* NOVA ANIMAÇÃO DA LOGO */
+    .player-logo.animate-center {
+      bottom: 50% !important;
+      left: 50% !important;
+      transform: translate(-50%, 50%) scale(2);
+      opacity: 1;
+      z-index: 200;
+      transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    
+    .player-logo.animate-to-position {
+      bottom: 60px !important;
+      left: 15px !important;
+      transform: none;
+      opacity: 0.7;
+      z-index: 100;
+      transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    
     .player-logo:hover {
       opacity: 1;
     }
@@ -1612,7 +1632,7 @@
           <video id="videoPlayer" class="video-js" controls preload="auto"></video>
 
           <!-- Logo padrão dentro do player no canto inferior esquerdo -->
-          <img src="https://i.ibb.co/wYHRkPj/Text-Toos-Apk.png" alt="Logo Player" class="player-logo">
+          <img src="https://i.ibb.co/wYHRkPj/Text-Toos-Apk.png" alt="Logo Player" class="player-logo" id="playerLogo">
           
           <!-- Radio info overlay - MELHORADO COM LOGO -->
           <div class="radio-info-overlay" id="radioInfoOverlay">
@@ -3093,11 +3113,37 @@
         return item;
       }
 
+      // NOVA FUNÇÃO PARA ANIMAR A LOGO
+      animateLogo() {
+        const logo = document.getElementById('playerLogo');
+        
+        // Reset any existing classes
+        logo.classList.remove('animate-center', 'animate-to-position');
+        
+        // Force reflow
+        logo.offsetHeight;
+        
+        // Animate to center
+        logo.classList.add('animate-center');
+        
+        // After 1.5 seconds, animate to final position
+        setTimeout(() => {
+          logo.classList.remove('animate-center');
+          logo.classList.add('animate-to-position');
+          
+          // Remove the class after animation completes
+          setTimeout(() => {
+            logo.classList.remove('animate-to-position');
+          }, 1200);
+        }, 1500);
+      }
+
       playChannel(channel) {
         const progress = this.checkContinueWatching(channel.id, 'channel');
 
         const doPlay = (startTime = 0) => {
           try {
+            this.animateLogo(); // NOVA LINHA - Anima a logo
             this.currentChannel = channel.id;
             this.currentMovie = null;
             this.currentSeries = null;
@@ -3137,6 +3183,7 @@
 
         const doPlay = (startTime = 0) => {
           try {
+            this.animateLogo(); // NOVA LINHA - Anima a logo
             this.currentMovie = movie;
             this.currentChannel = null;
             this.currentSeries = null;
@@ -3173,6 +3220,7 @@
 
       playRadio(radio) {
         try {
+          this.animateLogo(); // NOVA LINHA - Anima a logo
           this.currentRadio = radio;
           this.currentChannel = null;
           this.currentMovie = null;
@@ -3414,6 +3462,7 @@
 
         const doPlay = (startTime = 0) => {
           try {
+            this.animateLogo(); // NOVA LINHA - Anima a logo
             this.currentEpisode = episode;
             this.currentEpisodeIndex = index;
             this.currentChannel = null;
