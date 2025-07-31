@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerador de Lista M3U - IPTV Player</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: 222.2 84% 4.9%;
+      --primary-foreground: 210 40% 98%;
+      --secondary: 210 40% 96%;
+      --secondary-foreground: 222.2 84% 4.9%;
+      --muted: 210 40% 96%;
+      --muted-foreground: 215.4 16.3% 46.9%;
+      --accent: 210 40% 96%;
+      --accent-foreground: 222.2 84% 4.9%;
+      --destructive: 0 84.2% 60.2%;
+      --destructive-foreground: 210 40% 98%;
+      --border: 214.3 31.8% 91.4%;
+      --input: 214.3 31.8% 91.4%;
+      --ring: 222.2 84% 4.9%;
+      --background: 0 0% 100%;
+      --foreground: 222.2 84% 4.9%;
+      --card: 0 0% 100%;
+      --card-foreground: 222.2 84% 4.9%;
+      --popover: 0 0% 100%;
+      --popover-foreground: 222.2 84% 4.9%;
+      --radius: 0.5rem;
+    }
+
+    .dark {
+      --primary: 210 40% 98%;
+      --primary-foreground: 222.2 84% 4.9%;
+      --secondary: 222.2 47% 11%;
+      --secondary-foreground: 210 40% 98%;
+      --muted: 222.2 47% 11%;
+      --muted-foreground: 215 20.2% 65.1%;
+      --accent: 222.2 47% 11%;
+      --accent-foreground: 210 40% 98%;
+      --destructive: 0 62.8% 30.6%;
+      --destructive-foreground: 210 40% 98%;
+      --border: 222.2 47% 11%;
+      --input: 222.2 47% 11%;
+      --ring: 212.7 26.8% 83.9%;
+      --background: 222.2 84% 4.9%;
+      --foreground: 210 40% 98%;
+      --card: 222.2 84% 4.9%;
+      --card-foreground: 210 40% 98%;
+      --popover: 222.2 84% 4.9%;
+      --popover-foreground: 210 40% 98%;
+    }
+
+    * {
+      border-color: hsl(var(--border));
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: hsl(var(--background));
+      color: hsl(var(--foreground));
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding: 2rem 0;
+      background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-foreground) / 0.1));
+      border-radius: var(--radius);
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin: 0;
+      color: hsl(var(--primary-foreground));
+      text-shadow: 0 2px 4px rgb(0 0 0 / 0.3);
+    }
+
+    .header p {
+      font-size: 1.1rem;
+      margin: 0.5rem 0 0 0;
+      color: hsl(var(--primary-foreground) / 0.8);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    .card {
+      background-color: hsl(var(--card));
+      border: 1px solid hsl(var(--border));
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    }
+
+    .card-header {
+      margin-bottom: 1.5rem;
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: hsl(var(--card-foreground));
+      margin: 0 0 0.5rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: hsl(var(--foreground));
+      margin-bottom: 0.5rem;
+    }
+
+    .input,
+    .select,
+    .textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid hsl(var(--input));
+      border-radius: var(--radius);
+      background-color: hsl(var(--background));
+      color: hsl(var(--foreground));
+      font-size: 0.875rem;
+      transition: all 0.2s ease-in-out;
+    }
+
+    .input:focus,
+    .select:focus,
+    .textarea:focus {
+      outline: none;
+      border-color: hsl(var(--ring));
+      box-shadow: 0 0 0 2px hsl(var(--ring) / 0.2);
+    }
+
+    .textarea {
+      height: 400px;
+      resize: vertical;
+      font-family: 'Courier New', monospace;
+      font-size: 0.8rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background-color: hsl(var(--primary));
+      color: hsl(var(--primary-foreground));
+    }
+
+    .btn-primary:hover {
+      background-color: hsl(var(--primary) / 0.9);
+    }
+
+    .btn-secondary {
+      background-color: hsl(var(--secondary));
+      color: hsl(var(--secondary-foreground));
+    }
+
+    .btn-secondary:hover {
+      background-color: hsl(var(--secondary) / 0.8);
+    }
+
+    .btn-destructive {
+      background-color: hsl(var(--destructive));
+      color: hsl(var(--destructive-foreground));
+    }
+
+    .btn-destructive:hover {
+      background-color: hsl(var(--destructive) / 0.9);
+    }
+
+    .btn-success {
+      background-color: hsl(142 71% 45%);
+      color: hsl(var(--primary-foreground));
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .list-item {
+      border: 1px solid hsl(var(--border));
+      border-radius: var(--radius);
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+      background-color: hsl(var(--card));
+      transition: all 0.2s ease-in-out;
+    }
+
+    .list-item:hover {
+      box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+    }
+
+    .list-item-title {
+      font-weight: 600;
+      color: hsl(var(--card-foreground));
+      margin-bottom: 0.25rem;
+    }
+
+    .list-item-category {
+      display: inline-block;
+      background-color: hsl(var(--accent));
+      color: hsl(var(--accent-foreground));
+      padding: 0.25rem 0.5rem;
+      border-radius: calc(var(--radius) / 2);
+      font-size: 0.75rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+
+    .list-item-url {
+      font-size: 0.8rem;
+      color: hsl(var(--muted-foreground));
+      word-break: break-all;
+      margin-bottom: 0.75rem;
+    }
+
+    .file-input {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+    }
+
+    .file-input input[type="file"] {
+      position: absolute;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    .file-input-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem;
+      border: 2px dashed hsl(var(--border));
+      border-radius: var(--radius);
+      background-color: hsl(var(--muted) / 0.5);
+      color: hsl(var(--muted-foreground));
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+    }
+
+    .file-input:hover .file-input-label {
+      border-color: hsl(var(--ring));
+      background-color: hsl(var(--accent));
+    }
+
+    .alert {
+      padding: 1rem;
+      border-radius: var(--radius);
+      margin-bottom: 1rem;
+      border: 1px solid;
+    }
+
+    .alert-success {
+      background-color: hsl(142 71% 45% / 0.1);
+      border-color: hsl(142 71% 45%);
+      color: hsl(142 71% 45%);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: hsl(var(--muted-foreground));
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    .theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 1000;
+    }
+
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .header h1 {
+        font-size: 2rem;
+      }
+      
+      .container {
+        padding: 1rem;
+      }
+      
+      .btn-group {
+        flex-direction: column;
+      }
+      
+      .btn {
+        width: 100%;
+      }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <button class="btn btn-secondary theme-toggle" onclick="toggleTheme()">
+    <i class="fas fa-moon" id="theme-icon"></i>
+  </button>
+
+  <div class="container">
+    <div class="header">
+      <h1><i class="fas fa-list"></i> Gerador de Lista M3U</h1>
+      <p>Crie e gerencie suas listas de canais de TV, filmes e séries</p>
+    </div>
+
+    <div class="grid">
+      <!-- Formulário -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">
+            <i class="fas fa-plus-circle"></i>
+            Adicionar Conteúdo
+          </h2>
+        </div>
+
+        <form id="formulario">
+          <div class="form-group">
+            <label class="label" for="nome">Nome do canal ou filme</label>
+            <input type="text" id="nome" class="input" placeholder="Ex: Globo HD, Matrix, etc." required>
+          </div>
+
+          <div class="form-group">
+            <label class="label" for="url">URL do conteúdo</label>
+            <input type="url" id="url" class="input" placeholder="https://..." required>
+          </div>
+
+          <div class="form-group">
+            <label class="label" for="logo">URL do ícone/logo (opcional)</label>
+            <input type="url" id="logo" class="input" placeholder="https://...">
+          </div>
+
+          <div class="form-group">
+            <label class="label" for="categoria">Categoria</label>
+            <select id="categoria" class="select">
+              <option value="Canais">📺 Canais</option>
+              <option value="Filmes">🎬 Filmes</option>
+              <option value="Séries">📺 Séries</option>
+              <option value="Infantil">🧸 Infantil</option>
+              <option value="Documentários">📖 Documentários</option>
+              <option value="Esportes">⚽ Esportes</option>
+              <option value="Notícias">📰 Notícias</option>
+            </select>
+          </div>
+
+          <div class="btn-group">
+            <button type="submit" id="btnSalvar" class="btn btn-primary">
+              <i class="fas fa-plus"></i> Adicionar
+            </button>
+            <button type="button" id="btnAtualizar" class="btn btn-success" style="display: none;">
+              <i class="fas fa-check"></i> Atualizar
+            </button>
+          </div>
+        </form>
+
+        <div class="form-group" style="margin-top: 2rem;">
+          <label class="label">
+            <i class="fas fa-file-upload"></i> Importar lista M3U
+          </label>
+          <div class="file-input">
+            <input type="file" id="uploadM3U" accept=".m3u,.m3u8">
+            <div class="file-input-label">
+              <i class="fas fa-cloud-upload-alt"></i>
+              Clique para selecionar arquivo
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lista e Output -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">
+            <i class="fas fa-list-ul"></i>
+            Conteúdo Adicionado (<span id="contador">0</span>)
+          </h2>
+        </div>
+
+        <div id="lista">
+          <div class="empty-state">
+            <i class="fas fa-list"></i>
+            <p>Nenhum item adicionado ainda</p>
+          </div>
+        </div>
+
+        <div style="margin-top: 2rem;">
+          <label class="label" for="m3uOutput">
+            <i class="fas fa-code"></i> Sua Lista M3U
+          </label>
+          <textarea id="m3uOutput" class="textarea" readonly placeholder="Sua lista M3U aparecerá aqui..."></textarea>
+          
+          <div class="btn-group" style="margin-top: 1rem;">
+            <button id="copiarBtn" class="btn btn-secondary">
+              <i class="fas fa-copy"></i> Copiar Lista
+            </button>
+            <button id="downloadBtn" class="btn btn-primary">
+              <i class="fas fa-download"></i> Download M3U
+            </button>
+            <button id="limparBtn" class="btn btn-destructive">
+              <i class="fas fa-trash"></i> Limpar Tudo
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById("formulario");
+    const listaDiv = document.getElementById("lista");
+    const m3uOutput = document.getElementById("m3uOutput");
+    const btnSalvar = document.getElementById("btnSalvar");
+    const btnAtualizar = document.getElementById("btnAtualizar");
+    const copiarBtn = document.getElementById("copiarBtn");
+    const downloadBtn = document.getElementById("downloadBtn");
+    const limparBtn = document.getElementById("limparBtn");
+    const contador = document.getElementById("contador");
+
+    let itens = JSON.parse(localStorage.getItem("m3ulista")) || [];
+    let editando = false;
+    let editIndex = null;
+
+    function atualizarInterface() {
+      contador.textContent = itens.length;
+      
+      if (itens.length === 0) {
+        listaDiv.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-list"></i>
+            <p>Nenhum item adicionado ainda</p>
+          </div>
+        `;
+        m3uOutput.value = "";
+        return;
+      }
+
+      listaDiv.innerHTML = "";
+      let m3u = "#EXTM3U\n\n";
+
+      itens.forEach((item, index) => {
+        const bloco = `#EXTINF:-1 tvg-id="${item.nome}" tvg-name="${item.nome}" tvg-logo="${item.logo}" group-title="${item.categoria}",${item.nome}\n${item.url}`;
+        m3u += bloco + "\n\n";
+
+        const div = document.createElement("div");
+        div.className = "list-item fade-in";
+        div.innerHTML = `
+          <div class="list-item-title">${item.nome}</div>
+          <div class="list-item-category">${item.categoria}</div>
+          <div class="list-item-url">${item.url}</div>
+          <div class="btn-group">
+            <button onclick="editarItem(${index})" class="btn btn-secondary">
+              <i class="fas fa-edit"></i> Editar
+            </button>
+            <button onclick="removerItem(${index})" class="btn btn-destructive">
+              <i class="fas fa-trash"></i> Remover
+            </button>
+          </div>
+        `;
+        listaDiv.appendChild(div);
+      });
+
+      m3uOutput.value = m3u;
+      localStorage.setItem("m3ulista", JSON.stringify(itens));
+    }
+
+    function mostrarAlerta(message, type = 'success') {
+      const alertDiv = document.createElement('div');
+      alertDiv.className = `alert alert-${type} fade-in`;
+      alertDiv.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+      
+      const container = document.querySelector('.container');
+      container.insertBefore(alertDiv, container.firstChild);
+      
+      setTimeout(() => {
+        alertDiv.remove();
+      }, 3000);
+    }
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const nome = document.getElementById("nome").value.trim();
+      const url = document.getElementById("url").value.trim();
+      const logo = document.getElementById("logo").value.trim();
+      const categoria = document.getElementById("categoria").value;
+
+      if (!nome || !url) return;
+
+      if (editando) {
+        itens[editIndex] = { nome, url, logo, categoria };
+        editando = false;
+        editIndex = null;
+        btnSalvar.style.display = "inline-flex";
+        btnAtualizar.style.display = "none";
+        mostrarAlerta("Item atualizado com sucesso!");
+      } else {
+        itens.push({ nome, url, logo, categoria });
+        mostrarAlerta("Item adicionado com sucesso!");
+      }
+
+      form.reset();
+      atualizarInterface();
+    });
+
+    btnAtualizar.addEventListener("click", function () {
+      form.dispatchEvent(new Event("submit"));
+    });
+
+    function removerItem(index) {
+      if (confirm("Deseja remover este item?")) {
+        itens.splice(index, 1);
+        atualizarInterface();
+        mostrarAlerta("Item removido com sucesso!");
+      }
+    }
+
+    function editarItem(index) {
+      const item = itens[index];
+      document.getElementById("nome").value = item.nome;
+      document.getElementById("url").value = item.url;
+      document.getElementById("logo").value = item.logo;
+      document.getElementById("categoria").value = item.categoria;
+
+      editando = true;
+      editIndex = index;
+      btnSalvar.style.display = "none";
+      btnAtualizar.style.display = "inline-flex";
+
+      document.getElementById("nome").focus();
+      document.getElementById("nome").scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    // Importar M3U
+    document.getElementById("uploadM3U").addEventListener("change", function (e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        const lines = event.target.result.split(/\r?\n/);
+        let nome = "", logo = "", grupo = "";
+        let imported = 0;
+
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+
+          if (line.startsWith("#EXTINF:")) {
+            const tvgName = line.match(/tvg-name="([^"]+)"/);
+            const tvgLogo = line.match(/tvg-logo="([^"]+)"/);
+            const groupTitle = line.match(/group-title="([^"]+)"/);
+            const title = line.split(",").pop().trim();
+
+            nome = tvgName ? tvgName[1] : title;
+            logo = tvgLogo ? tvgLogo[1] : "";
+            grupo = groupTitle ? groupTitle[1] : "Outros";
+          }
+
+          if (line.startsWith("http")) {
+            itens.push({
+              nome,
+              url: line.trim(),
+              logo,
+              categoria: grupo
+            });
+            imported++;
+          }
+        }
+
+        atualizarInterface();
+        mostrarAlerta(`${imported} itens importados com sucesso!`);
+      };
+
+      reader.readAsText(file);
+    });
+
+    // Copiar para clipboard
+    copiarBtn.addEventListener("click", async function () {
+      try {
+        await navigator.clipboard.writeText(m3uOutput.value);
+        const originalText = copiarBtn.innerHTML;
+        copiarBtn.innerHTML = '<i class="fas fa-check"></i> Copiado!';
+        copiarBtn.classList.add('btn-success');
+        
+        setTimeout(() => {
+          copiarBtn.innerHTML = originalText;
+          copiarBtn.classList.remove('btn-success');
+        }, 2000);
+      } catch (err) {
+        m3uOutput.select();
+        document.execCommand("copy");
+        mostrarAlerta("Lista copiada para a área de transferência!");
+      }
+    });
+
+    // Download M3U
+    downloadBtn.addEventListener("click", function () {
+      if (!m3uOutput.value) {
+        alert("Adicione pelo menos um item antes de fazer o download!");
+        return;
+      }
+
+      const blob = new Blob([m3uOutput.value], { type: "text/plain" });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "playlist.m3u";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      
+      mostrarAlerta("Download iniciado!");
+    });
+
+    // Limpar tudo
+    limparBtn.addEventListener("click", function () {
+      if (confirm("Deseja limpar toda a lista? Esta ação não pode ser desfeita.")) {
+        itens = [];
+        atualizarInterface();
+        localStorage.removeItem("m3ulista");
+        mostrarAlerta("Lista limpa com sucesso!");
+      }
+    });
+
+    // Theme toggle
+    function toggleTheme() {
+      const body = document.body;
+      const themeIcon = document.getElementById("theme-icon");
+      
+      if (body.classList.contains("dark")) {
+        body.classList.remove("dark");
+        themeIcon.className = "fas fa-moon";
+        localStorage.setItem("theme", "light");
+      } else {
+        body.classList.add("dark");
+        themeIcon.className = "fas fa-sun";
+        localStorage.setItem("theme", "dark");
+      }
+    }
+
+    // Inicializar tema
+    function initTheme() {
+      const savedTheme = localStorage.getItem("theme");
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      
+      if (savedTheme === "dark" || (!savedTheme && prefersDark)) {
+        document.body.classList.add("dark");
+        document.getElementById("theme-icon").className = "fas fa-sun";
+      }
+    }
+
+    // Inicializar aplicação
+    initTheme();
+    atualizarInterface();
+  </script>
+</body>
+</html>
