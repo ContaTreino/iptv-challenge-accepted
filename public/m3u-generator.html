@@ -359,6 +359,11 @@
     <div class="header">
       <h1><i class="fas fa-list"></i> Gerador de Lista M3U</h1>
       <p>Crie e gerencie suas listas de canais de TV, filmes e séries</p>
+      
+      <div class="form-group" style="max-width: 400px; margin: 1.5rem auto 0;">
+        <label class="label" for="listName" style="color: hsl(var(--primary-foreground));">Nome da Lista</label>
+        <input type="text" id="listName" class="input" placeholder="Minha Lista IPTV" value="Minha Lista IPTV">
+      </div>
     </div>
 
     <div class="grid">
@@ -389,7 +394,7 @@
 
           <div class="form-group">
             <label class="label" for="categoria">Categoria</label>
-            <select id="categoria" class="select">
+            <select id="categoria" class="select" onchange="toggleSeriesFields()">
               <option value="Canais">📺 Canais</option>
               <option value="Filmes">🎬 Filmes</option>
               <option value="Séries">📺 Séries</option>
@@ -398,6 +403,32 @@
               <option value="Esportes">⚽ Esportes</option>
               <option value="Notícias">📰 Notícias</option>
             </select>
+          </div>
+
+          <!-- Campos específicos para séries -->
+          <div id="seriesFields" style="display: none;">
+            <div class="form-group">
+              <label class="label" for="temporada">Temporada</label>
+              <input type="number" id="temporada" class="input" placeholder="Ex: 1" min="1">
+            </div>
+
+            <div class="form-group">
+              <label class="label" for="episodio">Episódio</label>
+              <input type="number" id="episodio" class="input" placeholder="Ex: 1" min="1">
+            </div>
+
+            <div class="form-group">
+              <label class="label" for="tituloEpisodio">Título do Episódio (opcional)</label>
+              <input type="text" id="tituloEpisodio" class="input" placeholder="Ex: Pilot">
+            </div>
+          </div>
+
+          <!-- Teste de URL -->
+          <div class="form-group">
+            <button type="button" id="btnTestarUrl" class="btn btn-secondary" style="width: 100%;">
+              <i class="fas fa-play"></i> Testar URL
+            </button>
+            <div id="statusTeste" style="margin-top: 0.5rem; font-size: 0.8rem;"></div>
           </div>
 
           <div class="btn-group">
@@ -492,19 +523,42 @@
       }
 
       listaDiv.innerHTML = "";
-      let m3u = "#EXTM3U\n\n";
+      const listName = document.getElementById("listName").value || "Minha Lista IPTV";
+      let m3u = `#EXTM3U url-tvg="" tv-test="" x-tvg-url="" name="${listName}"\n\n`;
 
       itens.forEach((item, index) => {
-        const bloco = `#EXTINF:-1 tvg-id="${item.nome}" tvg-name="${item.nome}" tvg-logo="${item.logo}" group-title="${item.categoria}",${item.nome}\n${item.url}`;
+        let nomeCompleto = item.nome;
+        
+        // Se for série, formatear o nome com temporada e episódio
+        if (item.categoria === "Séries" && item.temporada && item.episodio) {
+          nomeCompleto = `${item.nome} - T${String(item.temporada).padStart(2, '0')}E${String(item.episodio).padStart(2, '0')}`;
+          if (item.tituloEpisodio) {
+            nomeCompleto += ` - ${item.tituloEpisodio}`;
+          }
+        }
+        
+        const bloco = `#EXTINF:-1 tvg-id="${nomeCompleto}" tvg-name="${nomeCompleto}" tvg-logo="${item.logo}" group-title="${item.categoria}",${nomeCompleto}\n${item.url}`;
         m3u += bloco + "\n\n";
 
         const div = document.createElement("div");
         div.className = "list-item fade-in";
+        
+        let extraInfo = "";
+        if (item.categoria === "Séries" && item.temporada && item.episodio) {
+          extraInfo = `<div style="font-size: 0.8rem; color: hsl(var(--muted-foreground)); margin-bottom: 0.5rem;">
+            Temporada ${item.temporada} • Episódio ${item.episodio}${item.tituloEpisodio ? ` • ${item.tituloEpisodio}` : ''}
+          </div>`;
+        }
+        
         div.innerHTML = `
           <div class="list-item-title">${item.nome}</div>
           <div class="list-item-category">${item.categoria}</div>
+          ${extraInfo}
           <div class="list-item-url">${item.url}</div>
           <div class="btn-group">
+            <button onclick="testarUrl('${item.url}')" class="btn btn-secondary">
+              <i class="fas fa-play"></i> Testar
+            </button>
             <button onclick="editarItem(${index})" class="btn btn-secondary">
               <i class="fas fa-edit"></i> Editar
             </button>
@@ -533,28 +587,109 @@
       }, 3000);
     }
 
+    function toggleSeriesFields() {
+      const categoria = document.getElementById("categoria").value;
+      const seriesFields = document.getElementById("seriesFields");
+      
+      if (categoria === "Séries") {
+        seriesFields.style.display = "block";
+      } else {
+        seriesFields.style.display = "none";
+        document.getElementById("temporada").value = "";
+        document.getElementById("episodio").value = "";
+        document.getElementById("tituloEpisodio").value = "";
+      }
+    }
+
+    async function testarUrl(url) {
+      const statusDiv = document.getElementById("statusTeste");
+      statusDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testando URL...';
+      statusDiv.style.color = 'hsl(var(--muted-foreground))';
+      
+      try {
+        const response = await fetch(url, { method: 'HEAD', mode: 'no-cors' });
+        statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> URL válida!';
+        statusDiv.style.color = 'hsl(142 71% 45%)';
+      } catch (error) {
+        // Para streams IPTV, vamos tentar criar um elemento de vídeo para testar
+        const video = document.createElement('video');
+        video.src = url;
+        video.style.display = 'none';
+        document.body.appendChild(video);
+        
+        video.onloadstart = () => {
+          statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> Stream detectado!';
+          statusDiv.style.color = 'hsl(142 71% 45%)';
+          document.body.removeChild(video);
+        };
+        
+        video.onerror = () => {
+          statusDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> URL pode estar offline';
+          statusDiv.style.color = 'hsl(var(--destructive))';
+          document.body.removeChild(video);
+        };
+        
+        setTimeout(() => {
+          if (document.body.contains(video)) {
+            statusDiv.innerHTML = '<i class="fas fa-question-circle"></i> Não foi possível verificar';
+            statusDiv.style.color = 'hsl(var(--muted-foreground))';
+            document.body.removeChild(video);
+          }
+        }, 5000);
+      }
+      
+      setTimeout(() => {
+        statusDiv.innerHTML = '';
+      }, 10000);
+    }
+
+    document.getElementById("btnTestarUrl").addEventListener("click", function() {
+      const url = document.getElementById("url").value.trim();
+      if (!url) {
+        document.getElementById("statusTeste").innerHTML = '<i class="fas fa-exclamation-circle"></i> Digite uma URL primeiro';
+        document.getElementById("statusTeste").style.color = 'hsl(var(--destructive))';
+        return;
+      }
+      testarUrl(url);
+    });
+
     form.addEventListener("submit", function (e) {
       e.preventDefault();
       const nome = document.getElementById("nome").value.trim();
       const url = document.getElementById("url").value.trim();
       const logo = document.getElementById("logo").value.trim();
       const categoria = document.getElementById("categoria").value;
+      const temporada = document.getElementById("temporada").value;
+      const episodio = document.getElementById("episodio").value;
+      const tituloEpisodio = document.getElementById("tituloEpisodio").value.trim();
 
       if (!nome || !url) return;
 
+      const itemData = { nome, url, logo, categoria };
+      
+      // Adicionar dados específicos de séries se necessário
+      if (categoria === "Séries" && temporada && episodio) {
+        itemData.temporada = parseInt(temporada);
+        itemData.episodio = parseInt(episodio);
+        if (tituloEpisodio) {
+          itemData.tituloEpisodio = tituloEpisodio;
+        }
+      }
+
       if (editando) {
-        itens[editIndex] = { nome, url, logo, categoria };
+        itens[editIndex] = itemData;
         editando = false;
         editIndex = null;
         btnSalvar.style.display = "inline-flex";
         btnAtualizar.style.display = "none";
         mostrarAlerta("Item atualizado com sucesso!");
       } else {
-        itens.push({ nome, url, logo, categoria });
+        itens.push(itemData);
         mostrarAlerta("Item adicionado com sucesso!");
       }
 
       form.reset();
+      toggleSeriesFields();
       atualizarInterface();
     });
 
@@ -576,6 +711,15 @@
       document.getElementById("url").value = item.url;
       document.getElementById("logo").value = item.logo;
       document.getElementById("categoria").value = item.categoria;
+      
+      // Preencher campos de série se existirem
+      if (item.categoria === "Séries") {
+        document.getElementById("temporada").value = item.temporada || "";
+        document.getElementById("episodio").value = item.episodio || "";
+        document.getElementById("tituloEpisodio").value = item.tituloEpisodio || "";
+      }
+      
+      toggleSeriesFields();
 
       editando = true;
       editIndex = index;
