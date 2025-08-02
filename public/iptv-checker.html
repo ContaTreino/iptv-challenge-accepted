@@ -7,64 +7,57 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #0070f3;
-            --secondary-color: #7c3aed;
-            --accent-color: #10b981;
-            --error-color: #ef4444;
-            --warning-color: #f59e0b;
-            --background: #0a0a0a;
-            --card-bg: #1a1a1a;
-            --border-color: #2a2a2a;
-            --text-primary: #ffffff;
-            --text-secondary: #a1a1aa;
-            --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            --gradient-success: linear-gradient(135deg, var(--accent-color), #059669);
-            --gradient-error: linear-gradient(135deg, var(--error-color), #dc2626);
-            --shadow-glow: 0 0 40px rgba(0, 112, 243, 0.15);
+            --primary: hsl(221, 83%, 53%);
+            --primary-dark: hsl(221, 83%, 45%);
+            --secondary: hsl(262, 83%, 58%);
+            --accent: hsl(142, 76%, 36%);
+            --error: hsl(0, 84%, 60%);
+            --warning: hsl(38, 92%, 50%);
+            --background: hsl(240, 10%, 3.9%);
+            --card: hsl(240, 10%, 8%);
+            --border: hsl(240, 3.7%, 15.9%);
+            --foreground: hsl(0, 0%, 98%);
+            --muted: hsl(240, 3.8%, 46.1%);
+            --gradient-primary: linear-gradient(135deg, var(--primary), var(--secondary));
+            --shadow-glow: 0 0 40px hsla(221, 83%, 53%, 0.15);
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         /* Theme System */
         .theme-cosmic {
-            --primary-color: #667eea;
-            --secondary-color: #764ba2;
-            --accent-color: #f093fb;
-            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --primary: hsl(246, 80%, 60%);
+            --secondary: hsl(260, 44%, 58%);
+            --accent: hsl(316, 73%, 52%);
         }
 
         .theme-sunset {
-            --primary-color: #fa709a;
-            --secondary-color: #fee140;
-            --accent-color: #ff6b6b;
-            --bg-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --primary: hsl(339, 90%, 51%);
+            --secondary: hsl(47, 97%, 64%);
+            --accent: hsl(1, 83%, 63%);
         }
 
         .theme-ocean {
-            --primary-color: #00d2ff;
-            --secondary-color: #3a7bd5;
-            --accent-color: #74ebd5;
-            --bg-gradient: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+            --primary: hsl(193, 100%, 50%);
+            --secondary: hsl(221, 56%, 51%);
+            --accent: hsl(168, 84%, 68%);
         }
 
         .theme-forest {
-            --primary-color: #11998e;
-            --secondary-color: #38ef7d;
-            --accent-color: #a8e6cf;
-            --bg-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            --primary: hsl(173, 80%, 40%);
+            --secondary: hsl(123, 38%, 57%);
+            --accent: hsl(141, 43%, 74%);
         }
 
         .theme-royal {
-            --primary-color: #8360c3;
-            --secondary-color: #2ebf91;
-            --accent-color: #ffecd2;
-            --bg-gradient: linear-gradient(135deg, #8360c3 0%, #2ebf91 100%);
+            --primary: hsl(272, 51%, 54%);
+            --secondary: hsl(162, 63%, 41%);
+            --accent: hsl(42, 87%, 55%);
         }
 
         .theme-neon {
-            --primary-color: #ff0080;
-            --secondary-color: #00ff80;
-            --accent-color: #8000ff;
-            --bg-gradient: linear-gradient(135deg, #ff0080 0%, #00ff80 100%);
+            --primary: hsl(315, 100%, 50%);
+            --secondary: hsl(120, 100%, 50%);
+            --accent: hsl(270, 100%, 50%);
         }
 
         * {
@@ -76,10 +69,11 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: var(--background);
-            color: var(--text-primary);
+            color: var(--foreground);
             line-height: 1.6;
             overflow-x: hidden;
             transition: var(--transition);
+            position: relative;
         }
 
         body::before {
@@ -90,9 +84,9 @@
             right: 0;
             bottom: 0;
             background: 
-                radial-gradient(circle at 20% 80%, rgba(0, 112, 243, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(124, 58, 237, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
+                radial-gradient(circle at 20% 80%, hsla(221, 83%, 53%, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, hsla(262, 83%, 58%, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, hsla(142, 76%, 36%, 0.05) 0%, transparent 50%);
             z-index: -2;
             pointer-events: none;
             animation: backgroundShift 20s ease-in-out infinite;
@@ -115,15 +109,38 @@
             transition: all 0.5s ease;
         }
 
-        .custom-background-active::after {
-            opacity: 0.08 !important;
-        }
-
         @keyframes backgroundShift {
             0%, 100% { transform: translateX(0) translateY(0) scale(1); }
             25% { transform: translateX(-10px) translateY(-5px) scale(1.02); }
             50% { transform: translateX(10px) translateY(5px) scale(0.98); }
             75% { transform: translateX(-5px) translateY(10px) scale(1.01); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: var(--shadow-glow); }
+            50% { transform: scale(1.05); box-shadow: 0 0 60px hsla(221, 83%, 53%, 0.3); }
+            100% { transform: scale(1); box-shadow: var(--shadow-glow); }
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         /* Settings Button */
@@ -136,24 +153,17 @@
             background: var(--gradient-primary);
             border: none;
             border-radius: 50%;
-            color: white;
+            color: var(--foreground);
             font-size: 1.5rem;
             cursor: pointer;
             z-index: 1000;
             transition: var(--transition);
             box-shadow: var(--shadow-glow);
-            animation: pulse 2s infinite;
+            animation: pulse 3s infinite;
         }
 
         .settings-btn:hover {
             transform: scale(1.1) rotate(90deg);
-            box-shadow: 0 0 60px rgba(0, 112, 243, 0.5);
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
         }
 
         /* Settings Modal */
@@ -164,7 +174,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
+            background: hsla(0, 0%, 0%, 0.8);
             backdrop-filter: blur(10px);
             z-index: 2000;
             animation: fadeIn 0.3s ease;
@@ -175,25 +185,16 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: var(--card-bg);
+            background: var(--card);
             border-radius: 20px;
             padding: 2rem;
             width: 90%;
             max-width: 600px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            animation: slideInUp 0.3s ease;
-        }
-
-        @keyframes slideInUp {
-            from {
-                opacity: 0;
-                transform: translate(-50%, -30%) scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1);
-            }
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 60px hsla(0, 0%, 0%, 0.5);
+            animation: slideUp 0.3s ease;
         }
 
         .settings-header {
@@ -202,49 +203,65 @@
             align-items: center;
             margin-bottom: 2rem;
             padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border);
         }
 
         .settings-title {
             font-size: 1.5rem;
             font-weight: 700;
-            color: var(--primary-color);
+            color: var(--primary);
         }
 
         .close-btn {
             background: none;
             border: none;
-            color: var(--text-secondary);
+            color: var(--muted);
             font-size: 1.5rem;
             cursor: pointer;
             transition: var(--transition);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .close-btn:hover {
-            color: var(--error-color);
-            transform: scale(1.2);
+            color: var(--error);
+            background: hsla(0, 84%, 60%, 0.1);
         }
 
-        .theme-selector {
+        .theme-selector, .media-section {
             margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .theme-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             gap: 1rem;
-            margin-top: 1rem;
         }
 
         .theme-option {
             padding: 1rem;
             border-radius: 15px;
-            border: 2px solid var(--border-color);
+            border: 2px solid var(--border);
             cursor: pointer;
             text-align: center;
             transition: var(--transition);
             position: relative;
             overflow: hidden;
+            background: var(--card);
         }
 
         .theme-option::before {
@@ -258,42 +275,31 @@
             transition: var(--transition);
         }
 
-        .theme-cosmic::before { background: linear-gradient(135deg, #667eea, #764ba2); }
-        .theme-sunset::before { background: linear-gradient(135deg, #fa709a, #fee140); }
-        .theme-ocean::before { background: linear-gradient(135deg, #00d2ff, #3a7bd5); }
-        .theme-forest::before { background: linear-gradient(135deg, #11998e, #38ef7d); }
-        .theme-royal::before { background: linear-gradient(135deg, #8360c3, #2ebf91); }
-        .theme-neon::before { background: linear-gradient(135deg, #ff0080, #00ff80); }
+        .theme-cosmic::before { background: linear-gradient(135deg, hsl(246, 80%, 60%), hsl(260, 44%, 58%)); }
+        .theme-sunset::before { background: linear-gradient(135deg, hsl(339, 90%, 51%), hsl(47, 97%, 64%)); }
+        .theme-ocean::before { background: linear-gradient(135deg, hsl(193, 100%, 50%), hsl(221, 56%, 51%)); }
+        .theme-forest::before { background: linear-gradient(135deg, hsl(173, 80%, 40%), hsl(123, 38%, 57%)); }
+        .theme-royal::before { background: linear-gradient(135deg, hsl(272, 51%, 54%), hsl(162, 63%, 41%)); }
+        .theme-neon::before { background: linear-gradient(135deg, hsl(315, 100%, 50%), hsl(120, 100%, 50%)); }
 
         .theme-option:hover {
-            border-color: var(--primary-color);
-            transform: translateY(-5px);
+            border-color: var(--primary);
+            transform: translateY(-3px);
         }
 
         .theme-option.active {
-            border-color: var(--accent-color);
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+            border-color: var(--accent);
+            box-shadow: 0 0 20px hsla(142, 76%, 36%, 0.3);
         }
 
         .theme-name {
             position: relative;
             z-index: 1;
             font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .media-section {
-            margin-bottom: 1.5rem;
-        }
-
-        .media-section h3 {
-            margin-bottom: 1rem;
-            color: var(--primary-color);
-            font-size: 1.2rem;
+            color: var(--foreground);
         }
 
         .input-group {
-            position: relative;
             margin-bottom: 1rem;
         }
 
@@ -301,16 +307,16 @@
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 600;
-            color: var(--text-primary);
+            color: var(--foreground);
         }
 
         .input-field {
             width: 100%;
             padding: 1rem;
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid var(--border-color);
+            background: hsla(0, 0%, 100%, 0.05);
+            border: 2px solid var(--border);
             border-radius: 12px;
-            color: var(--text-primary);
+            color: var(--foreground);
             font-size: 1rem;
             transition: var(--transition);
             backdrop-filter: blur(10px);
@@ -318,13 +324,13 @@
 
         .input-field:focus {
             outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(0, 112, 243, 0.1);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px hsla(221, 83%, 53%, 0.1);
         }
 
         .btn {
             background: var(--gradient-primary);
-            color: white;
+            color: var(--foreground);
             border: none;
             padding: 1rem 2rem;
             border-radius: 12px;
@@ -334,6 +340,7 @@
             transition: var(--transition);
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 0.5rem;
             text-decoration: none;
             position: relative;
@@ -342,7 +349,7 @@
 
         .btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(0, 112, 243, 0.4);
+            box-shadow: 0 15px 30px hsla(221, 83%, 53%, 0.4);
         }
 
         .btn::before {
@@ -352,7 +359,7 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            background: linear-gradient(90deg, transparent, hsla(0, 0%, 100%, 0.2), transparent);
             transition: left 0.5s;
         }
 
@@ -362,7 +369,6 @@
 
         .btn-full {
             width: 100%;
-            justify-content: center;
         }
 
         .btn:disabled {
@@ -371,6 +377,49 @@
             transform: none;
         }
 
+        /* Audio Controls */
+        .audio-controls {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 1rem;
+            z-index: 1000;
+            display: none;
+            animation: slideUp 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .audio-controls.visible {
+            display: block;
+        }
+
+        .audio-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .audio-title {
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .volume-slider {
+            width: 100px;
+            accent-color: var(--primary);
+        }
+
+        /* Main Layout */
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -381,39 +430,34 @@
         .header {
             text-align: center;
             margin-bottom: 3rem;
-            animation: fadeInUp 0.8s ease-out;
+            animation: slideUp 0.8s ease-out;
         }
 
         .title {
-            font-size: 3rem;
+            font-size: clamp(2rem, 5vw, 3rem);
             font-weight: 700;
             background: var(--gradient-primary);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             margin-bottom: 1rem;
-            animation: glow 2s ease-in-out infinite alternate;
-        }
-
-        @keyframes glow {
-            from { filter: drop-shadow(0 0 20px rgba(0, 112, 243, 0.5)); }
-            to { filter: drop-shadow(0 0 30px rgba(124, 58, 237, 0.7)); }
+            animation: pulse 4s ease-in-out infinite;
         }
 
         .subtitle {
             font-size: 1.2rem;
-            color: var(--text-secondary);
+            color: var(--muted);
             margin-bottom: 2rem;
         }
 
         .input-section {
-            background: var(--card-bg);
+            background: var(--card);
             border-radius: 20px;
             padding: 2rem;
             margin-bottom: 2rem;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border);
             box-shadow: var(--shadow-glow);
-            animation: fadeInUp 0.8s ease-out 0.2s both;
+            animation: slideUp 0.8s ease-out 0.2s both;
             transition: var(--transition);
             position: relative;
             overflow: hidden;
@@ -426,7 +470,7 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: conic-gradient(from 0deg at 50% 50%, transparent, var(--primary-color), transparent);
+            background: conic-gradient(from 0deg at 50% 50%, transparent, var(--primary), transparent);
             opacity: 0;
             animation: rotate 4s linear infinite;
             transition: opacity 0.3s ease;
@@ -436,14 +480,9 @@
             opacity: 0.1;
         }
 
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
         .input-section:hover {
             transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0, 112, 243, 0.2);
+            box-shadow: 0 20px 40px hsla(221, 83%, 53%, 0.2);
         }
 
         .textarea-field {
@@ -454,14 +493,14 @@
 
         .progress-section {
             margin: 2rem 0;
-            animation: fadeInUp 0.8s ease-out 0.4s both;
+            animation: slideUp 0.8s ease-out 0.4s both;
         }
 
         .progress-container {
-            background: var(--card-bg);
+            background: var(--card);
             border-radius: 20px;
             padding: 2rem;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border);
             box-shadow: var(--shadow-glow);
         }
 
@@ -487,550 +526,266 @@
         .stat-number {
             font-size: 2rem;
             font-weight: 700;
-            color: var(--primary-color);
+            color: var(--primary);
             display: block;
         }
 
         .stat-label {
             font-size: 0.9rem;
-            color: var(--text-secondary);
+            color: var(--muted);
         }
 
         .progress-bar-container {
             width: 100%;
             height: 12px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
+            background: var(--border);
+            border-radius: 6px;
             overflow: hidden;
-            position: relative;
+            margin: 1rem 0;
         }
 
         .progress-bar {
             height: 100%;
             background: var(--gradient-primary);
-            border-radius: 10px;
+            border-radius: 6px;
             transition: width 0.3s ease;
             position: relative;
-            overflow: hidden;
         }
 
         .progress-bar::after {
             content: '';
             position: absolute;
             top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            animation: progressShimmer 2s infinite;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, hsla(0, 0%, 100%, 0.3), transparent);
+            animation: shimmer 2s infinite;
         }
 
-        @keyframes progressShimmer {
-            0% { left: -100%; }
-            100% { left: 100%; }
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
 
         .results-section {
-            animation: fadeInUp 0.8s ease-out 0.6s both;
+            margin-top: 2rem;
         }
 
         .result-card {
-            background: var(--card-bg);
+            background: var(--card);
             border-radius: 20px;
             padding: 2rem;
             margin-bottom: 2rem;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border);
             box-shadow: var(--shadow-glow);
             transition: var(--transition);
-            animation: slideInLeft 0.5s ease-out;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .result-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
-            transition: left 0.8s ease;
-        }
-
-        .result-card:hover::before {
-            left: 100%;
+            animation: slideUp 0.5s ease-out;
         }
 
         .result-card:hover {
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 20px 40px rgba(0, 112, 243, 0.2);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px hsla(0, 0%, 0%, 0.3);
         }
 
         .result-header {
             display: flex;
+            justify-content: space-between;
             align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
             gap: 1rem;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border-color);
         }
 
         .status-badge {
             padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
+            border-radius: 50px;
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .status-active {
-            background: var(--gradient-success);
-            color: white;
+            background: hsla(142, 76%, 36%, 0.2);
+            color: var(--accent);
+            border: 1px solid var(--accent);
         }
 
         .status-error {
-            background: var(--gradient-error);
-            color: white;
+            background: hsla(0, 84%, 60%, 0.2);
+            color: var(--error);
+            border: 1px solid var(--error);
         }
 
         .info-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
         }
 
         .info-item {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.75rem;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            transition: var(--transition);
+            padding: 1rem;
+            background: hsla(0, 0%, 100%, 0.03);
+            border-radius: 12px;
+            border: 1px solid var(--border);
         }
 
-        .info-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateX(5px);
+        .info-item i {
+            color: var(--primary);
+            width: 20px;
+            text-align: center;
         }
 
         .info-label {
             font-weight: 600;
-            color: var(--primary-color);
-            min-width: 120px;
+            color: var(--muted);
         }
 
         .info-value {
-            color: var(--text-primary);
-            word-break: break-all;
+            color: var(--foreground);
+            margin-left: auto;
+            font-weight: 500;
         }
 
         .link-group {
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--border-color);
+            border-top: 1px solid var(--border);
+            padding-top: 2rem;
+        }
+
+        .link-group h4 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .link-buttons {
             display: flex;
-            gap: 1rem;
             flex-wrap: wrap;
-            margin-top: 1rem;
+            gap: 1rem;
         }
 
         .link-btn {
-            padding: 0.5rem 1rem;
-            background: rgba(0, 112, 243, 0.2);
-            border: 1px solid var(--primary-color);
-            border-radius: 8px;
-            color: var(--primary-color);
+            background: hsla(221, 83%, 53%, 0.1);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
             text-decoration: none;
-            font-size: 0.9rem;
+            font-weight: 600;
             transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .link-btn:hover {
-            background: var(--primary-color);
-            color: white;
+            background: var(--primary);
+            color: var(--foreground);
             transform: translateY(-2px);
+        }
+
+        .error-message {
+            padding: 1rem;
+            background: hsla(0, 84%, 60%, 0.1);
+            border: 1px solid var(--error);
+            border-radius: 12px;
+            color: var(--error);
+        }
+
+        .success-message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent);
+            color: var(--foreground);
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            z-index: 3000;
+            animation: slideUp 0.3s ease;
+        }
+
+        .error-toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--error);
+            color: var(--foreground);
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            z-index: 3000;
+            animation: slideUp 0.3s ease;
+        }
+
+        .hidden {
+            display: none;
         }
 
         .loading-spinner {
             display: inline-block;
             width: 20px;
             height: 20px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            border: 2px solid hsla(0, 0%, 100%, 0.3);
             border-radius: 50%;
-            border-top-color: var(--primary-color);
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .fade-in {
-            animation: fadeIn 0.5s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes slideInLeft {
-            from {
-                opacity: 0;
-                transform: translateX(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .error-message {
-            color: var(--error-color);
-            background: rgba(239, 68, 68, 0.1);
-            padding: 1rem;
-            border-radius: 10px;
-            border-left: 4px solid var(--error-color);
-            margin: 1rem 0;
-        }
-
-        .success-message {
-            color: var(--accent-color);
-            background: rgba(16, 185, 129, 0.1);
-            padding: 1rem;
-            border-radius: 10px;
-            border-left: 4px solid var(--accent-color);
-            margin: 1rem 0;
-        }
-
-        /* Audio Controls */
-        .audio-controls {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--card-bg);
-            border-radius: 15px;
-            padding: 1rem;
-            border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-glow);
-            z-index: 1000;
-            display: none;
-            min-width: 250px;
-        }
-
-        .audio-controls.visible {
-            display: block;
-            animation: slideInUp 0.3s ease;
-        }
-
-        .audio-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .audio-title {
-            font-weight: 600;
-            color: var(--primary-color);
-            flex: 1;
-        }
-
-        .volume-control {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .volume-slider {
-            width: 80px;
+            border-top-color: var(--foreground);
+            animation: rotate 1s linear infinite;
         }
 
         /* Responsive Design */
-        @media (max-width: 576px) {
+        @media (max-width: 768px) {
             .container {
-                padding: 0.5rem;
-                margin: 0;
-            }
-
-            .title {
-                font-size: 1.5rem;
-                margin-bottom: 0.5rem;
-            }
-
-            .subtitle {
-                font-size: 1rem;
-                margin-bottom: 1rem;
-            }
-
-            .input-section,
-            .result-card,
-            .progress-container {
                 padding: 1rem;
-                margin-bottom: 1rem;
-                border-radius: 15px;
-            }
-
-            .input-field {
-                padding: 0.75rem 1rem;
-                font-size: 0.9rem;
-            }
-
-            .textarea-field {
-                min-height: 100px;
-            }
-
-            .btn {
-                padding: 0.75rem 1.5rem;
-                font-size: 0.9rem;
-            }
-
-            .progress-stats {
-                gap: 1rem;
-                justify-content: space-around;
-            }
-
-            .stat-number {
-                font-size: 1.5rem;
-            }
-
-            .stat-label {
-                font-size: 0.8rem;
-            }
-
-            .info-grid {
-                grid-template-columns: 1fr;
-                gap: 0.75rem;
-            }
-
-            .info-item {
-                padding: 0.5rem;
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.25rem;
-            }
-
-            .info-label {
-                min-width: auto;
-                font-size: 0.9rem;
-            }
-
-            .info-value {
-                font-size: 0.85rem;
-            }
-
-            .link-buttons {
-                justify-content: center;
-                gap: 0.5rem;
-            }
-
-            .link-btn {
-                padding: 0.4rem 0.8rem;
-                font-size: 0.8rem;
-            }
-
-            .settings-btn {
-                width: 50px;
-                height: 50px;
-                font-size: 1.2rem;
-                top: 15px;
-                right: 15px;
             }
 
             .settings-content {
-                width: 95%;
                 padding: 1.5rem;
+                margin: 1rem;
+                width: calc(100% - 2rem);
             }
 
             .theme-grid {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 0.5rem;
+            }
+
+            .progress-stats {
+                justify-content: center;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
             }
 
             .audio-controls {
+                left: 10px;
                 bottom: 10px;
                 right: 10px;
-                min-width: 200px;
-                padding: 0.75rem;
             }
         }
 
-        @media (min-width: 577px) and (max-width: 768px) {
-            .container {
-                padding: 1rem;
-            }
-
+        @media (max-width: 480px) {
             .title {
                 font-size: 2rem;
             }
 
-            .subtitle {
-                font-size: 1.1rem;
-            }
-
-            .input-section,
-            .result-card,
-            .progress-container {
-                padding: 1.5rem;
-            }
-
-            .progress-stats {
-                justify-content: center;
-                gap: 1.5rem;
-            }
-
-            .info-grid {
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            .theme-grid {
+                grid-template-columns: 1fr;
             }
 
             .link-buttons {
-                justify-content: center;
-            }
-
-            .theme-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
-        @media (min-width: 769px) and (max-width: 1024px) {
-            .container {
-                padding: 1.5rem;
-                max-width: 95%;
-            }
-
-            .title {
-                font-size: 2.5rem;
-            }
-
-            .info-grid {
-                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            }
-
-            .progress-stats {
-                gap: 2rem;
-            }
-        }
-
-        @media (min-width: 1025px) and (max-width: 1399px) {
-            .container {
-                max-width: 1200px;
-                padding: 2rem;
-            }
-
-            .title {
-                font-size: 3rem;
-            }
-
-            .info-grid {
-                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            }
-        }
-
-        @media (min-width: 1400px) {
-            .container {
-                max-width: 1400px;
-                padding: 2.5rem;
-            }
-
-            .title {
-                font-size: 3.5rem;
-            }
-
-            .subtitle {
-                font-size: 1.4rem;
-            }
-
-            .input-section,
-            .result-card,
-            .progress-container {
-                padding: 2.5rem;
-            }
-
-            .input-field {
-                padding: 1.25rem 1.75rem;
-                font-size: 1.1rem;
-            }
-
-            .btn {
-                padding: 1.25rem 2.5rem;
-                font-size: 1.1rem;
-            }
-
-            .stat-number {
-                font-size: 2.5rem;
-            }
-
-            .stat-label {
-                font-size: 1rem;
-            }
-
-            .info-grid {
-                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-                gap: 2rem;
-            }
-
-            .info-item {
-                padding: 1rem;
-            }
-
-            .info-label {
-                font-size: 1.1rem;
-                min-width: 140px;
-            }
-
-            .info-value {
-                font-size: 1rem;
-            }
-        }
-
-        @media (max-height: 500px) and (orientation: landscape) {
-            .container {
-                padding: 0.5rem;
-            }
-
-            .title {
-                font-size: 1.8rem;
-                margin-bottom: 0.5rem;
-            }
-
-            .subtitle {
-                font-size: 0.9rem;
-                margin-bottom: 1rem;
-            }
-
-            .input-section {
-                padding: 1rem;
-            }
-
-            .progress-stats {
-                flex-direction: row;
-                gap: 1rem;
+                flex-direction: column;
             }
         }
     </style>
 </head>
-
 <body>
     <!-- Settings Button -->
     <button class="settings-btn" id="settingsBtn">
@@ -1043,7 +798,7 @@
             <div class="settings-header">
                 <h2 class="settings-title">
                     <i class="fas fa-palette"></i>
-                    Personalização
+                    Configurações
                 </h2>
                 <button class="close-btn" id="closeBtn">
                     <i class="fas fa-times"></i>
@@ -1051,50 +806,64 @@
             </div>
 
             <div class="theme-selector">
-                <h3><i class="fas fa-paint-brush"></i> Temas de Cores</h3>
+                <h3 class="section-title">
+                    <i class="fas fa-paint-brush"></i>
+                    Escolher Tema
+                </h3>
                 <div class="theme-grid">
+                    <div class="theme-option" data-theme="">
+                        <span class="theme-name">Padrão</span>
+                    </div>
                     <div class="theme-option theme-cosmic" data-theme="cosmic">
-                        <div class="theme-name">Cósmico</div>
+                        <span class="theme-name">Cósmico</span>
                     </div>
                     <div class="theme-option theme-sunset" data-theme="sunset">
-                        <div class="theme-name">Pôr do Sol</div>
+                        <span class="theme-name">Pôr do Sol</span>
                     </div>
                     <div class="theme-option theme-ocean" data-theme="ocean">
-                        <div class="theme-name">Oceano</div>
+                        <span class="theme-name">Oceano</span>
                     </div>
                     <div class="theme-option theme-forest" data-theme="forest">
-                        <div class="theme-name">Floresta</div>
+                        <span class="theme-name">Floresta</span>
                     </div>
                     <div class="theme-option theme-royal" data-theme="royal">
-                        <div class="theme-name">Real</div>
+                        <span class="theme-name">Real</span>
                     </div>
                     <div class="theme-option theme-neon" data-theme="neon">
-                        <div class="theme-name">Neon</div>
+                        <span class="theme-name">Neon</span>
                     </div>
                 </div>
             </div>
 
             <div class="media-section">
-                <h3><i class="fas fa-image"></i> Background Personalizado</h3>
+                <h3 class="section-title">
+                    <i class="fas fa-image"></i>
+                    Personalizar Fundo
+                </h3>
                 <div class="input-group">
-                    <label class="input-label">URL da Imagem/GIF:</label>
-                    <input type="url" class="input-field" id="backgroundInput" placeholder="Cole aqui o link da imagem ou GIF">
+                    <label for="backgroundInput" class="input-label">URL da Imagem/GIF</label>
+                    <input type="url" id="backgroundInput" class="input-field" 
+                           placeholder="https://exemplo.com/imagem.gif">
                 </div>
-                <button class="btn" id="applyBackgroundBtn">
-                    <i class="fas fa-check"></i>
-                    Aplicar Background
+                <button id="applyBackgroundBtn" class="btn btn-full">
+                    <i class="fas fa-image"></i>
+                    Aplicar Fundo
                 </button>
             </div>
 
             <div class="media-section">
-                <h3><i class="fas fa-music"></i> Música de Fundo</h3>
+                <h3 class="section-title">
+                    <i class="fas fa-music"></i>
+                    Música de Fundo
+                </h3>
                 <div class="input-group">
-                    <label class="input-label">URL do Áudio (MP3, WAV, etc.):</label>
-                    <input type="url" class="input-field" id="audioInput" placeholder="Cole aqui o link da música">
+                    <label for="audioInput" class="input-label">URL do Áudio (MP3/OGG)</label>
+                    <input type="url" id="audioInput" class="input-field" 
+                           placeholder="https://exemplo.com/musica.mp3">
                 </div>
-                <button class="btn" id="playAudioBtn">
+                <button id="playAudioBtn" class="btn btn-full">
                     <i class="fas fa-play"></i>
-                    Reproduzir Música
+                    Tocar Música
                 </button>
             </div>
         </div>
@@ -1170,7 +939,7 @@
                 <div class="progress-bar-container">
                     <div id="progressBar" class="progress-bar" style="width: 0%"></div>
                 </div>
-                <div style="text-align: center; margin-top: 1rem; color: var(--text-secondary);">
+                <div style="text-align: center; margin-top: 1rem; color: var(--muted);">
                     <span id="progressText">Preparando verificação...</span>
                 </div>
             </div>
@@ -1184,6 +953,15 @@
     <script>
         class IPTVChecker {
             constructor() {
+                this.initElements();
+                this.totals = { live: 0, series: 0, vod: 0 };
+                this.startTime = null;
+                this.timeInterval = null;
+                this.backgroundAudio = null;
+                this.init();
+            }
+
+            initElements() {
                 this.checkBtn = document.getElementById('checkBtn');
                 this.urlInput = document.getElementById('urlInput');
                 this.progressSection = document.getElementById('progressSection');
@@ -1197,13 +975,6 @@
                     vod: document.getElementById('vodCounter'),
                     time: document.getElementById('timeCounter')
                 };
-
-                this.totals = { live: 0, series: 0, vod: 0 };
-                this.startTime = null;
-                this.timeInterval = null;
-                this.backgroundAudio = null;
-
-                this.init();
             }
 
             init() {
@@ -1215,7 +986,6 @@
                     this.urlInput.style.height = this.urlInput.scrollHeight + 'px';
                 });
 
-                // Settings functionality
                 this.initSettings();
             }
 
@@ -1228,8 +998,8 @@
                 const playAudioBtn = document.getElementById('playAudioBtn');
                 const stopAudioBtn = document.getElementById('stopAudioBtn');
                 const volumeSlider = document.getElementById('volumeSlider');
-                const audioControls = document.getElementById('audioControls');
 
+                // Settings modal
                 settingsBtn.addEventListener('click', () => {
                     settingsModal.style.display = 'block';
                 });
@@ -1253,15 +1023,15 @@
                         const theme = option.dataset.theme;
                         document.body.className = theme ? `theme-${theme}` : '';
                         
-                        // Save theme preference
-                        localStorage.setItem('iptvTheme', theme);
+                        localStorage.setItem('iptvTheme', theme || '');
+                        this.showToast('Tema aplicado!', 'success');
                     });
                 });
 
                 // Load saved theme
                 const savedTheme = localStorage.getItem('iptvTheme');
                 if (savedTheme) {
-                    document.body.className = `theme-${savedTheme}`;
+                    document.body.className = savedTheme ? `theme-${savedTheme}` : '';
                     const themeOption = document.querySelector(`[data-theme="${savedTheme}"]`);
                     if (themeOption) themeOption.classList.add('active');
                 }
@@ -1270,34 +1040,13 @@
                 applyBackgroundBtn.addEventListener('click', () => {
                     const backgroundUrl = document.getElementById('backgroundInput').value.trim();
                     if (backgroundUrl) {
-                        document.body.style.setProperty('--custom-background', `url('${backgroundUrl}')`);
-                        document.body::after = { backgroundImage: `url('${backgroundUrl}')` };
-                        
-                        // Create dynamic style for the background
-                        let customStyle = document.getElementById('customBgStyle');
-                        if (!customStyle) {
-                            customStyle = document.createElement('style');
-                            customStyle.id = 'customBgStyle';
-                            document.head.appendChild(customStyle);
-                        }
-                        
-                        customStyle.textContent = `
-                            body::after {
-                                background-image: url('${backgroundUrl}') !important;
-                            }
-                            body.custom-background-active::after {
-                                opacity: 0.08 !important;
-                            }
-                        `;
-                        
-                        document.body.classList.add('custom-background-active');
+                        this.setCustomBackground(backgroundUrl);
                         localStorage.setItem('iptvBackground', backgroundUrl);
-                        
-                        this.showMessage('Background aplicado com sucesso!', 'success');
+                        this.showToast('Fundo aplicado!', 'success');
                     }
                 });
 
-                // Audio player
+                // Audio controls
                 playAudioBtn.addEventListener('click', () => {
                     const audioUrl = document.getElementById('audioInput').value.trim();
                     if (audioUrl) {
@@ -1319,14 +1068,28 @@
                 const savedBackground = localStorage.getItem('iptvBackground');
                 if (savedBackground) {
                     document.getElementById('backgroundInput').value = savedBackground;
-                    // Apply saved background
-                    applyBackgroundBtn.click();
+                    this.setCustomBackground(savedBackground);
                 }
+            }
+
+            setCustomBackground(url) {
+                let customStyle = document.getElementById('customBgStyle');
+                if (!customStyle) {
+                    customStyle = document.createElement('style');
+                    customStyle.id = 'customBgStyle';
+                    document.head.appendChild(customStyle);
+                }
+                
+                customStyle.textContent = `
+                    body::after {
+                        background-image: url('${url}') !important;
+                        opacity: 0.08 !important;
+                    }
+                `;
             }
 
             playBackgroundAudio(url) {
                 try {
-                    // Stop current audio if playing
                     this.stopBackgroundAudio();
                     
                     this.backgroundAudio = new Audio(url);
@@ -1335,18 +1098,18 @@
                     
                     this.backgroundAudio.play().then(() => {
                         document.getElementById('audioControls').classList.add('visible');
-                        this.showMessage('Música iniciada com sucesso!', 'success');
+                        this.showToast('Música iniciada!', 'success');
                         localStorage.setItem('iptvAudio', url);
                     }).catch(error => {
-                        this.showMessage('Erro ao reproduzir áudio: ' + error.message, 'error');
+                        this.showToast('Erro ao reproduzir áudio', 'error');
                     });
                     
                     this.backgroundAudio.onerror = () => {
-                        this.showMessage('Erro ao carregar o arquivo de áudio', 'error');
+                        this.showToast('Erro ao carregar áudio', 'error');
                     };
                     
                 } catch (error) {
-                    this.showMessage('Erro ao inicializar áudio: ' + error.message, 'error');
+                    this.showToast('Erro ao inicializar áudio', 'error');
                 }
             }
 
@@ -1359,18 +1122,15 @@
                 }
             }
 
-            showMessage(message, type) {
-                const messageDiv = document.createElement('div');
-                messageDiv.className = `${type}-message`;
-                messageDiv.textContent = message;
+            showToast(message, type) {
+                const toast = document.createElement('div');
+                toast.className = type === 'success' ? 'success-message' : 'error-toast';
+                toast.textContent = message;
                 
-                // Insert at top of container
-                const container = document.querySelector('.container');
-                container.insertBefore(messageDiv, container.firstChild);
+                document.body.appendChild(toast);
                 
-                // Remove after 3 seconds
                 setTimeout(() => {
-                    messageDiv.remove();
+                    toast.remove();
                 }, 3000);
             }
 
@@ -1378,7 +1138,7 @@
                 const urls = this.urlInput.value.trim().split('\n').filter(url => url.trim());
                 
                 if (urls.length === 0) {
-                    this.showMessage('Por favor, insira pelo menos uma URL válida.', 'error');
+                    this.showToast('Insira pelo menos uma URL válida', 'error');
                     return;
                 }
 
@@ -1390,6 +1150,8 @@
                     const url = urls[i].trim();
                     if (url) {
                         await this.checkSingleURL(url, i + 1, urls.length);
+                        // Pequena pausa para não sobrecarregar
+                        await new Promise(resolve => setTimeout(resolve, 100));
                     }
                 }
 
@@ -1419,7 +1181,7 @@
 
             async checkSingleURL(url, current, total) {
                 try {
-                    this.updateProgress(current, total, `Verificando ${current}/${total}: Extraindo dados...`);
+                    this.updateProgress(current, total, `Verificando ${current}/${total}: Analisando URL...`);
                     
                     const urlObj = new URL(url);
                     const params = new URLSearchParams(urlObj.search);
@@ -1435,15 +1197,19 @@
                     const baseURL = `http://${host}${port ? ':' + port : ''}`;
                     const apiBase = `${baseURL}/player_api.php?username=${username}&password=${password}`;
 
-                    // Fazer requisições em paralelo para maior eficiência
+                    this.updateProgress(current, total, `Verificando ${current}/${total}: Conectando ao servidor...`);
+
+                    // Usar um proxy CORS para requisições
+                    const proxyUrl = 'https://api.allorigins.win/raw?url=';
+                    
                     const [userInfo, liveStreams, series, vodStreams] = await Promise.all([
-                        this.fetchWithTimeout(`${apiBase}`),
-                        this.fetchWithTimeout(`${apiBase}&action=get_live_streams`),
-                        this.fetchWithTimeout(`${apiBase}&action=get_series`),
-                        this.fetchWithTimeout(`${apiBase}&action=get_vod_streams`)
+                        this.fetchWithProxy(`${proxyUrl}${encodeURIComponent(apiBase)}`),
+                        this.fetchWithProxy(`${proxyUrl}${encodeURIComponent(apiBase + '&action=get_live_streams')}`),
+                        this.fetchWithProxy(`${proxyUrl}${encodeURIComponent(apiBase + '&action=get_series')}`),
+                        this.fetchWithProxy(`${proxyUrl}${encodeURIComponent(apiBase + '&action=get_vod_streams')}`),
                     ]);
 
-                    this.updateProgress(current, total, `Verificando ${current}/${total}: Processando dados...`);
+                    this.updateProgress(current, total, `Verificando ${current}/${total}: Processando resultados...`);
 
                     const result = {
                         url,
@@ -1455,9 +1221,9 @@
                         userInfo: userInfo.user_info,
                         serverInfo: userInfo.server_info,
                         counts: {
-                            live: liveStreams?.length || 0,
-                            series: series?.length || 0,
-                            vod: vodStreams?.length || 0
+                            live: Array.isArray(liveStreams) ? liveStreams.length : 0,
+                            series: Array.isArray(series) ? series.length : 0,
+                            vod: Array.isArray(vodStreams) ? vodStreams.length : 0
                         }
                     };
 
@@ -1474,26 +1240,39 @@
                 }
             }
 
-            async fetchWithTimeout(url, timeout = 10000) {
+            async fetchWithProxy(url, timeout = 15000) {
                 const controller = new AbortController();
                 const id = setTimeout(() => controller.abort(), timeout);
                 
                 try {
                     const response = await fetch(url, { 
                         signal: controller.signal,
-                        mode: 'cors'
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                        }
                     });
+                    
                     clearTimeout(id);
                     
                     if (!response.ok) {
                         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                     }
                     
-                    return await response.json();
+                    const text = await response.text();
+                    
+                    // Tentar fazer parse do JSON
+                    try {
+                        return JSON.parse(text);
+                    } catch {
+                        // Se não for JSON válido, retornar um objeto vazio
+                        return {};
+                    }
+                    
                 } catch (error) {
                     clearTimeout(id);
                     if (error.name === 'AbortError') {
-                        throw new Error('Timeout: Servidor não respondeu em 10 segundos');
+                        throw new Error('Timeout: Servidor não respondeu em 15 segundos');
                     }
                     throw error;
                 }
@@ -1520,11 +1299,11 @@
                 }
 
                 const card = document.createElement('div');
-                card.className = 'result-card fade-in';
+                card.className = 'result-card';
                 
                 const createdDate = new Date(userInfo.created_at * 1000).toLocaleString('pt-BR');
                 const expDate = new Date(userInfo.exp_date * 1000).toLocaleString('pt-BR');
-                const timeNow = serverInfo.time_now ? new Date(serverInfo.time_now * 1000).toLocaleString('pt-BR') : 'N/A';
+                const timeNow = serverInfo?.time_now ? new Date(serverInfo.time_now * 1000).toLocaleString('pt-BR') : 'N/A';
 
                 const formats = userInfo.allowed_output_formats || ['m3u8'];
                 const formatLinks = formats.map(format => 
@@ -1571,17 +1350,17 @@
                         <div class="info-item">
                             <i class="fas fa-globe"></i>
                             <span class="info-label">Host:</span>
-                            <span class="info-value">${serverInfo.url || result.host}</span>
+                            <span class="info-value">${serverInfo?.url || result.host}</span>
                         </div>
                         <div class="info-item">
                             <i class="fas fa-plug"></i>
                             <span class="info-label">Porta:</span>
-                            <span class="info-value">${serverInfo.port || result.port || 'N/A'}</span>
+                            <span class="info-value">${serverInfo?.port || result.port || 'N/A'}</span>
                         </div>
                         <div class="info-item">
                             <i class="fas fa-shield-alt"></i>
                             <span class="info-label">HTTPS:</span>
-                            <span class="info-value">${serverInfo.https_port || 'N/A'}</span>
+                            <span class="info-value">${serverInfo?.https_port || 'N/A'}</span>
                         </div>
                         <div class="info-item">
                             <i class="fas fa-tv"></i>
@@ -1621,7 +1400,7 @@
 
             renderError(url, error) {
                 const card = document.createElement('div');
-                card.className = 'result-card fade-in';
+                card.className = 'result-card';
                 
                 card.innerHTML = `
                     <div class="result-header">
@@ -1646,7 +1425,7 @@
                 this.checkBtn.innerHTML = '<i class="fas fa-play"></i> <span>Iniciar Verificação</span>';
                 this.updateProgress(100, 100, 'Verificação concluída!');
                 
-                this.showMessage(`Verificação concluída! Encontrados: ${this.totals.live} canais, ${this.totals.series} séries, ${this.totals.vod} filmes.`, 'success');
+                this.showToast(`Verificação concluída! ${this.totals.live} canais, ${this.totals.series} séries, ${this.totals.vod} filmes.`, 'success');
             }
         }
 
