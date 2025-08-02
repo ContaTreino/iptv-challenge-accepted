@@ -24,6 +24,49 @@
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        /* Theme System */
+        .theme-cosmic {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --accent-color: #f093fb;
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .theme-sunset {
+            --primary-color: #fa709a;
+            --secondary-color: #fee140;
+            --accent-color: #ff6b6b;
+            --bg-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .theme-ocean {
+            --primary-color: #00d2ff;
+            --secondary-color: #3a7bd5;
+            --accent-color: #74ebd5;
+            --bg-gradient: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+        }
+
+        .theme-forest {
+            --primary-color: #11998e;
+            --secondary-color: #38ef7d;
+            --accent-color: #a8e6cf;
+            --bg-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .theme-royal {
+            --primary-color: #8360c3;
+            --secondary-color: #2ebf91;
+            --accent-color: #ffecd2;
+            --bg-gradient: linear-gradient(135deg, #8360c3 0%, #2ebf91 100%);
+        }
+
+        .theme-neon {
+            --primary-color: #ff0080;
+            --secondary-color: #00ff80;
+            --accent-color: #8000ff;
+            --bg-gradient: linear-gradient(135deg, #ff0080 0%, #00ff80 100%);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -36,6 +79,7 @@
             color: var(--text-primary);
             line-height: 1.6;
             overflow-x: hidden;
+            transition: var(--transition);
         }
 
         body::before {
@@ -49,15 +93,282 @@
                 radial-gradient(circle at 20% 80%, rgba(0, 112, 243, 0.1) 0%, transparent 50%),
                 radial-gradient(circle at 80% 20%, rgba(124, 58, 237, 0.1) 0%, transparent 50%),
                 radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
-            z-index: -1;
+            z-index: -2;
             pointer-events: none;
             animation: backgroundShift 20s ease-in-out infinite;
         }
 
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('https://c.tenor.com/RK3-YaV8ffEAAAAC/tenor.gif');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.03;
+            z-index: -1;
+            pointer-events: none;
+            transition: all 0.5s ease;
+        }
+
+        .custom-background-active::after {
+            opacity: 0.08 !important;
+        }
+
         @keyframes backgroundShift {
-            0%, 100% { transform: translateX(0) translateY(0); }
-            33% { transform: translateX(-10px) translateY(-5px); }
-            66% { transform: translateX(10px) translateY(5px); }
+            0%, 100% { transform: translateX(0) translateY(0) scale(1); }
+            25% { transform: translateX(-10px) translateY(-5px) scale(1.02); }
+            50% { transform: translateX(10px) translateY(5px) scale(0.98); }
+            75% { transform: translateX(-5px) translateY(10px) scale(1.01); }
+        }
+
+        /* Settings Button */
+        .settings-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 1000;
+            transition: var(--transition);
+            box-shadow: var(--shadow-glow);
+            animation: pulse 2s infinite;
+        }
+
+        .settings-btn:hover {
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 0 60px rgba(0, 112, 243, 0.5);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Settings Modal */
+        .settings-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .settings-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 600px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: slideInUp 0.3s ease;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -30%) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .settings-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .close-btn:hover {
+            color: var(--error-color);
+            transform: scale(1.2);
+        }
+
+        .theme-selector {
+            margin-bottom: 2rem;
+        }
+
+        .theme-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .theme-option {
+            padding: 1rem;
+            border-radius: 15px;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+            text-align: center;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0.2;
+            transition: var(--transition);
+        }
+
+        .theme-cosmic::before { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .theme-sunset::before { background: linear-gradient(135deg, #fa709a, #fee140); }
+        .theme-ocean::before { background: linear-gradient(135deg, #00d2ff, #3a7bd5); }
+        .theme-forest::before { background: linear-gradient(135deg, #11998e, #38ef7d); }
+        .theme-royal::before { background: linear-gradient(135deg, #8360c3, #2ebf91); }
+        .theme-neon::before { background: linear-gradient(135deg, #ff0080, #00ff80); }
+
+        .theme-option:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-5px);
+        }
+
+        .theme-option.active {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .theme-name {
+            position: relative;
+            z-index: 1;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .media-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .media-section h3 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 112, 243, 0.1);
+        }
+
+        .btn {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 112, 243, 0.4);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-full {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
 
         .container {
@@ -104,6 +415,30 @@
             box-shadow: var(--shadow-glow);
             animation: fadeInUp 0.8s ease-out 0.2s both;
             transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .input-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg at 50% 50%, transparent, var(--primary-color), transparent);
+            opacity: 0;
+            animation: rotate 4s linear infinite;
+            transition: opacity 0.3s ease;
+        }
+
+        .input-section:hover::before {
+            opacity: 0.1;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         .input-section:hover {
@@ -111,94 +446,10 @@
             box-shadow: 0 20px 40px rgba(0, 112, 243, 0.2);
         }
 
-        .input-group {
-            position: relative;
-            margin-bottom: 1.5rem;
-        }
-
-        .input-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 1rem 1.5rem;
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
-            color: var(--text-primary);
-            font-size: 1rem;
-            transition: var(--transition);
-            backdrop-filter: blur(10px);
-        }
-
-        .input-field:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(0, 112, 243, 0.1);
-            transform: translateY(-2px);
-        }
-
         .textarea-field {
             min-height: 120px;
             resize: vertical;
             font-family: 'Courier New', monospace;
-        }
-
-        .btn {
-            background: var(--gradient-primary);
-            color: white;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            text-decoration: none;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(0, 112, 243, 0.4);
-        }
-
-        .btn:active {
-            transform: translateY(-1px);
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .btn:hover::before {
-            left: 100%;
-        }
-
-        .btn-full {
-            width: 100%;
-            justify-content: center;
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
         }
 
         .progress-section {
@@ -292,10 +543,27 @@
             box-shadow: var(--shadow-glow);
             transition: var(--transition);
             animation: slideInLeft 0.5s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+            transition: left 0.8s ease;
+        }
+
+        .result-card:hover::before {
+            left: 100%;
         }
 
         .result-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-5px) scale(1.02);
             box-shadow: 0 20px 40px rgba(0, 112, 243, 0.2);
         }
 
@@ -456,8 +724,50 @@
             margin: 1rem 0;
         }
 
+        /* Audio Controls */
+        .audio-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-glow);
+            z-index: 1000;
+            display: none;
+            min-width: 250px;
+        }
+
+        .audio-controls.visible {
+            display: block;
+            animation: slideInUp 0.3s ease;
+        }
+
+        .audio-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .audio-title {
+            font-weight: 600;
+            color: var(--primary-color);
+            flex: 1;
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .volume-slider {
+            width: 80px;
+        }
+
         /* Responsive Design */
-        /* Mobile Phones */
         @media (max-width: 576px) {
             .container {
                 padding: 0.5rem;
@@ -539,9 +849,33 @@
                 padding: 0.4rem 0.8rem;
                 font-size: 0.8rem;
             }
+
+            .settings-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+                top: 15px;
+                right: 15px;
+            }
+
+            .settings-content {
+                width: 95%;
+                padding: 1.5rem;
+            }
+
+            .theme-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.5rem;
+            }
+
+            .audio-controls {
+                bottom: 10px;
+                right: 10px;
+                min-width: 200px;
+                padding: 0.75rem;
+            }
         }
 
-        /* Tablets */
         @media (min-width: 577px) and (max-width: 768px) {
             .container {
                 padding: 1rem;
@@ -573,9 +907,12 @@
             .link-buttons {
                 justify-content: center;
             }
+
+            .theme-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
         }
 
-        /* Tablets Landscape e Notebooks pequenos */
         @media (min-width: 769px) and (max-width: 1024px) {
             .container {
                 padding: 1.5rem;
@@ -595,7 +932,6 @@
             }
         }
 
-        /* Desktops e Notebooks */
         @media (min-width: 1025px) and (max-width: 1399px) {
             .container {
                 max-width: 1200px;
@@ -611,7 +947,6 @@
             }
         }
 
-        /* TV Box e telas grandes */
         @media (min-width: 1400px) {
             .container {
                 max-width: 1400px;
@@ -669,7 +1004,6 @@
             }
         }
 
-        /* Orientação landscape para dispositivos móveis */
         @media (max-height: 500px) and (orientation: landscape) {
             .container {
                 padding: 0.5rem;
@@ -698,6 +1032,89 @@
 </head>
 
 <body>
+    <!-- Settings Button -->
+    <button class="settings-btn" id="settingsBtn">
+        <i class="fas fa-cog"></i>
+    </button>
+
+    <!-- Settings Modal -->
+    <div class="settings-modal" id="settingsModal">
+        <div class="settings-content">
+            <div class="settings-header">
+                <h2 class="settings-title">
+                    <i class="fas fa-palette"></i>
+                    Personalização
+                </h2>
+                <button class="close-btn" id="closeBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="theme-selector">
+                <h3><i class="fas fa-paint-brush"></i> Temas de Cores</h3>
+                <div class="theme-grid">
+                    <div class="theme-option theme-cosmic" data-theme="cosmic">
+                        <div class="theme-name">Cósmico</div>
+                    </div>
+                    <div class="theme-option theme-sunset" data-theme="sunset">
+                        <div class="theme-name">Pôr do Sol</div>
+                    </div>
+                    <div class="theme-option theme-ocean" data-theme="ocean">
+                        <div class="theme-name">Oceano</div>
+                    </div>
+                    <div class="theme-option theme-forest" data-theme="forest">
+                        <div class="theme-name">Floresta</div>
+                    </div>
+                    <div class="theme-option theme-royal" data-theme="royal">
+                        <div class="theme-name">Real</div>
+                    </div>
+                    <div class="theme-option theme-neon" data-theme="neon">
+                        <div class="theme-name">Neon</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="media-section">
+                <h3><i class="fas fa-image"></i> Background Personalizado</h3>
+                <div class="input-group">
+                    <label class="input-label">URL da Imagem/GIF:</label>
+                    <input type="url" class="input-field" id="backgroundInput" placeholder="Cole aqui o link da imagem ou GIF">
+                </div>
+                <button class="btn" id="applyBackgroundBtn">
+                    <i class="fas fa-check"></i>
+                    Aplicar Background
+                </button>
+            </div>
+
+            <div class="media-section">
+                <h3><i class="fas fa-music"></i> Música de Fundo</h3>
+                <div class="input-group">
+                    <label class="input-label">URL do Áudio (MP3, WAV, etc.):</label>
+                    <input type="url" class="input-field" id="audioInput" placeholder="Cole aqui o link da música">
+                </div>
+                <button class="btn" id="playAudioBtn">
+                    <i class="fas fa-play"></i>
+                    Reproduzir Música
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio Controls -->
+    <div class="audio-controls" id="audioControls">
+        <div class="audio-info">
+            <span class="audio-title">🎵 Música de Fundo</span>
+            <button class="btn" id="stopAudioBtn" style="padding: 0.5rem;">
+                <i class="fas fa-stop"></i>
+            </button>
+        </div>
+        <div class="volume-control">
+            <i class="fas fa-volume-down"></i>
+            <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.1" value="0.3">
+            <i class="fas fa-volume-up"></i>
+        </div>
+    </div>
+
     <div class="container">
         <header class="header">
             <h1 class="title">
@@ -784,6 +1201,7 @@
                 this.totals = { live: 0, series: 0, vod: 0 };
                 this.startTime = null;
                 this.timeInterval = null;
+                this.backgroundAudio = null;
 
                 this.init();
             }
@@ -796,13 +1214,171 @@
                     this.urlInput.style.height = 'auto';
                     this.urlInput.style.height = this.urlInput.scrollHeight + 'px';
                 });
+
+                // Settings functionality
+                this.initSettings();
+            }
+
+            initSettings() {
+                const settingsBtn = document.getElementById('settingsBtn');
+                const settingsModal = document.getElementById('settingsModal');
+                const closeBtn = document.getElementById('closeBtn');
+                const themeOptions = document.querySelectorAll('.theme-option');
+                const applyBackgroundBtn = document.getElementById('applyBackgroundBtn');
+                const playAudioBtn = document.getElementById('playAudioBtn');
+                const stopAudioBtn = document.getElementById('stopAudioBtn');
+                const volumeSlider = document.getElementById('volumeSlider');
+                const audioControls = document.getElementById('audioControls');
+
+                settingsBtn.addEventListener('click', () => {
+                    settingsModal.style.display = 'block';
+                });
+
+                closeBtn.addEventListener('click', () => {
+                    settingsModal.style.display = 'none';
+                });
+
+                settingsModal.addEventListener('click', (e) => {
+                    if (e.target === settingsModal) {
+                        settingsModal.style.display = 'none';
+                    }
+                });
+
+                // Theme switching
+                themeOptions.forEach(option => {
+                    option.addEventListener('click', () => {
+                        themeOptions.forEach(opt => opt.classList.remove('active'));
+                        option.classList.add('active');
+                        
+                        const theme = option.dataset.theme;
+                        document.body.className = theme ? `theme-${theme}` : '';
+                        
+                        // Save theme preference
+                        localStorage.setItem('iptvTheme', theme);
+                    });
+                });
+
+                // Load saved theme
+                const savedTheme = localStorage.getItem('iptvTheme');
+                if (savedTheme) {
+                    document.body.className = `theme-${savedTheme}`;
+                    const themeOption = document.querySelector(`[data-theme="${savedTheme}"]`);
+                    if (themeOption) themeOption.classList.add('active');
+                }
+
+                // Background changer
+                applyBackgroundBtn.addEventListener('click', () => {
+                    const backgroundUrl = document.getElementById('backgroundInput').value.trim();
+                    if (backgroundUrl) {
+                        document.body.style.setProperty('--custom-background', `url('${backgroundUrl}')`);
+                        document.body::after = { backgroundImage: `url('${backgroundUrl}')` };
+                        
+                        // Create dynamic style for the background
+                        let customStyle = document.getElementById('customBgStyle');
+                        if (!customStyle) {
+                            customStyle = document.createElement('style');
+                            customStyle.id = 'customBgStyle';
+                            document.head.appendChild(customStyle);
+                        }
+                        
+                        customStyle.textContent = `
+                            body::after {
+                                background-image: url('${backgroundUrl}') !important;
+                            }
+                            body.custom-background-active::after {
+                                opacity: 0.08 !important;
+                            }
+                        `;
+                        
+                        document.body.classList.add('custom-background-active');
+                        localStorage.setItem('iptvBackground', backgroundUrl);
+                        
+                        this.showMessage('Background aplicado com sucesso!', 'success');
+                    }
+                });
+
+                // Audio player
+                playAudioBtn.addEventListener('click', () => {
+                    const audioUrl = document.getElementById('audioInput').value.trim();
+                    if (audioUrl) {
+                        this.playBackgroundAudio(audioUrl);
+                    }
+                });
+
+                stopAudioBtn.addEventListener('click', () => {
+                    this.stopBackgroundAudio();
+                });
+
+                volumeSlider.addEventListener('input', () => {
+                    if (this.backgroundAudio) {
+                        this.backgroundAudio.volume = volumeSlider.value;
+                    }
+                });
+
+                // Load saved background
+                const savedBackground = localStorage.getItem('iptvBackground');
+                if (savedBackground) {
+                    document.getElementById('backgroundInput').value = savedBackground;
+                    // Apply saved background
+                    applyBackgroundBtn.click();
+                }
+            }
+
+            playBackgroundAudio(url) {
+                try {
+                    // Stop current audio if playing
+                    this.stopBackgroundAudio();
+                    
+                    this.backgroundAudio = new Audio(url);
+                    this.backgroundAudio.loop = true;
+                    this.backgroundAudio.volume = document.getElementById('volumeSlider').value;
+                    
+                    this.backgroundAudio.play().then(() => {
+                        document.getElementById('audioControls').classList.add('visible');
+                        this.showMessage('Música iniciada com sucesso!', 'success');
+                        localStorage.setItem('iptvAudio', url);
+                    }).catch(error => {
+                        this.showMessage('Erro ao reproduzir áudio: ' + error.message, 'error');
+                    });
+                    
+                    this.backgroundAudio.onerror = () => {
+                        this.showMessage('Erro ao carregar o arquivo de áudio', 'error');
+                    };
+                    
+                } catch (error) {
+                    this.showMessage('Erro ao inicializar áudio: ' + error.message, 'error');
+                }
+            }
+
+            stopBackgroundAudio() {
+                if (this.backgroundAudio) {
+                    this.backgroundAudio.pause();
+                    this.backgroundAudio = null;
+                    document.getElementById('audioControls').classList.remove('visible');
+                    localStorage.removeItem('iptvAudio');
+                }
+            }
+
+            showMessage(message, type) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `${type}-message`;
+                messageDiv.textContent = message;
+                
+                // Insert at top of container
+                const container = document.querySelector('.container');
+                container.insertBefore(messageDiv, container.firstChild);
+                
+                // Remove after 3 seconds
+                setTimeout(() => {
+                    messageDiv.remove();
+                }, 3000);
             }
 
             async startCheck() {
                 const urls = this.urlInput.value.trim().split('\n').filter(url => url.trim());
                 
                 if (urls.length === 0) {
-                    this.showError('Por favor, insira pelo menos uma URL válida.');
+                    this.showMessage('Por favor, insira pelo menos uma URL válida.', 'error');
                     return;
                 }
 
@@ -968,73 +1544,73 @@
 
                     <div class="info-grid">
                         <div class="info-item">
-                            <i class="fas fa-user info-label"></i>
+                            <i class="fas fa-user"></i>
                             <span class="info-label">Usuário:</span>
                             <span class="info-value">${result.username}</span>
                         </div>
                         <div class="info-item">
-                            <i class="fas fa-key info-label"></i>
+                            <i class="fas fa-key"></i>
                             <span class="info-label">Senha:</span>
                             <span class="info-value">${result.password}</span>
                         </div>
                         <div class="info-item">
-                            <i class="fas fa-calendar-plus info-label"></i>
+                            <i class="fas fa-calendar-plus"></i>
                             <span class="info-label">Criado em:</span>
                             <span class="info-value">${createdDate}</span>
                         </div>
                         <div class="info-item">
-                            <i class="fas fa-calendar-times info-label"></i>
+                            <i class="fas fa-calendar-times"></i>
                             <span class="info-label">Expira em:</span>
                             <span class="info-value">${expDate}</span>
                         </div>
                         <div class="info-item">
-                            <i class="fas fa-users info-label"></i>
+                            <i class="fas fa-users"></i>
                             <span class="info-label">Conexões:</span>
                             <span class="info-value">${userInfo.active_cons}/${userInfo.max_connections}</span>
                         </div>
                         <div class="info-item">
-                            <i class="fas fa-clock info-label"></i>
-                            <span class="info-label">Hora do servidor:</span>
-                            <span class="info-value">${timeNow}</span>
+                            <i class="fas fa-globe"></i>
+                            <span class="info-label">Host:</span>
+                            <span class="info-value">${serverInfo.url || result.host}</span>
                         </div>
                         <div class="info-item">
-                            <i class="fas fa-tv info-label"></i>
-                            <span class="info-label">Canais:</span>
-                            <span class="info-value">${counts.live.toLocaleString()}</span>
-                        </div>
-                        <div class="info-item">
-                            <i class="fas fa-film info-label"></i>
-                            <span class="info-label">Filmes:</span>
-                            <span class="info-value">${counts.vod.toLocaleString()}</span>
-                        </div>
-                        <div class="info-item">
-                            <i class="fas fa-video info-label"></i>
-                            <span class="info-label">Séries:</span>
-                            <span class="info-value">${counts.series.toLocaleString()}</span>
-                        </div>
-                        <div class="info-item">
-                            <i class="fas fa-network-wired info-label"></i>
+                            <i class="fas fa-plug"></i>
                             <span class="info-label">Porta:</span>
-                            <span class="info-value">${serverInfo.port || 'N/A'}</span>
+                            <span class="info-value">${serverInfo.port || result.port || 'N/A'}</span>
                         </div>
                         <div class="info-item">
-                            <i class="fas fa-shield-alt info-label"></i>
+                            <i class="fas fa-shield-alt"></i>
                             <span class="info-label">HTTPS:</span>
                             <span class="info-value">${serverInfo.https_port || 'N/A'}</span>
                         </div>
                         <div class="info-item">
-                            <i class="fas fa-globe info-label"></i>
-                            <span class="info-label">Timezone:</span>
-                            <span class="info-value">${serverInfo.timezone || 'N/A'}</span>
+                            <i class="fas fa-tv"></i>
+                            <span class="info-label">Canais Live:</span>
+                            <span class="info-value">${counts.live.toLocaleString()}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-film"></i>
+                            <span class="info-label">Filmes VOD:</span>
+                            <span class="info-value">${counts.vod.toLocaleString()}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-video"></i>
+                            <span class="info-label">Séries:</span>
+                            <span class="info-value">${counts.series.toLocaleString()}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-clock"></i>
+                            <span class="info-label">Hora Servidor:</span>
+                            <span class="info-value">${timeNow}</span>
                         </div>
                     </div>
 
                     <div class="link-group">
-                        <h4><i class="fas fa-download"></i> Downloads e Acesso</h4>
+                        <h4><i class="fas fa-download"></i> Downloads das Listas</h4>
                         <div class="link-buttons">
                             ${formatLinks}
                             <a href="http://${result.host}/client_area/index.php?username=${result.username}&password=${result.password}&submit" target="_blank" class="link-btn">
-                                <i class="fas fa-external-link-alt"></i> Painel
+                                <i class="fas fa-external-link-alt"></i> Painel Cliente
                             </a>
                         </div>
                     </div>
@@ -1053,7 +1629,7 @@
                             <i class="fas fa-times-circle"></i>
                             ERRO
                         </div>
-                        <h3><i class="fas fa-exclamation-triangle"></i> Falha na verificação</h3>
+                        <h3><i class="fas fa-exclamation-triangle"></i> Falha na Verificação</h3>
                     </div>
                     <div class="error-message">
                         <strong>URL:</strong> ${url}<br>
@@ -1064,34 +1640,17 @@
                 this.resultsSection.appendChild(card);
             }
 
-            showError(message) {
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'error-message fade-in';
-                errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${message}`;
-                
-                this.resultsSection.innerHTML = '';
-                this.resultsSection.appendChild(errorDiv);
-            }
-
             finishCheck() {
                 clearInterval(this.timeInterval);
                 this.checkBtn.disabled = false;
                 this.checkBtn.innerHTML = '<i class="fas fa-play"></i> <span>Iniciar Verificação</span>';
-                this.progressText.textContent = 'Verificação concluída!';
+                this.updateProgress(100, 100, 'Verificação concluída!');
                 
-                const successMsg = document.createElement('div');
-                successMsg.className = 'success-message fade-in';
-                successMsg.innerHTML = `
-                    <i class="fas fa-check-circle"></i> 
-                    <strong>Verificação concluída com sucesso!</strong><br>
-                    Total encontrado: ${this.totals.live.toLocaleString()} canais, ${this.totals.series.toLocaleString()} séries, ${this.totals.vod.toLocaleString()} filmes
-                `;
-                
-                this.resultsSection.insertBefore(successMsg, this.resultsSection.firstChild);
+                this.showMessage(`Verificação concluída! Encontrados: ${this.totals.live} canais, ${this.totals.series} séries, ${this.totals.vod} filmes.`, 'success');
             }
         }
 
-        // Inicializar a aplicação quando o DOM estiver carregado
+        // Initialize when DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
             new IPTVChecker();
         });
