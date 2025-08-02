@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPTV Checker Pro - Verificador de Listas M3U</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0070f3;
+            --secondary-color: #7c3aed;
+            --accent-color: #10b981;
+            --error-color: #ef4444;
+            --warning-color: #f59e0b;
+            --background: #0a0a0a;
+            --card-bg: #1a1a1a;
+            --border-color: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            --gradient-success: linear-gradient(135deg, var(--accent-color), #059669);
+            --gradient-error: linear-gradient(135deg, var(--error-color), #dc2626);
+            --shadow-glow: 0 0 40px rgba(0, 112, 243, 0.15);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(0, 112, 243, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(124, 58, 237, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
+            z-index: -1;
+            pointer-events: none;
+            animation: backgroundShift 20s ease-in-out infinite;
+        }
+
+        @keyframes backgroundShift {
+            0%, 100% { transform: translateX(0) translateY(0); }
+            33% { transform: translateX(-10px) translateY(-5px); }
+            66% { transform: translateX(10px) translateY(5px); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .title {
+            font-size: 3rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 20px rgba(0, 112, 243, 0.5)); }
+            to { filter: drop-shadow(0 0 30px rgba(124, 58, 237, 0.7)); }
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .input-section {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-glow);
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+            transition: var(--transition);
+        }
+
+        .input-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 112, 243, 0.2);
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 112, 243, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .textarea-field {
+            min-height: 120px;
+            resize: vertical;
+            font-family: 'Courier New', monospace;
+        }
+
+        .btn {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 112, 243, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-full {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-section {
+            margin: 2rem 0;
+            animation: fadeInUp 0.8s ease-out 0.4s both;
+        }
+
+        .progress-container {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .progress-stats {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: progressShimmer 2s infinite;
+        }
+
+        @keyframes progressShimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .results-section {
+            animation: fadeInUp 0.8s ease-out 0.6s both;
+        }
+
+        .result-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-glow);
+            transition: var(--transition);
+            animation: slideInLeft 0.5s ease-out;
+        }
+
+        .result-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 112, 243, 0.2);
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-active {
+            background: var(--gradient-success);
+            color: white;
+        }
+
+        .status-error {
+            background: var(--gradient-error);
+            color: white;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            transition: var(--transition);
+        }
+
+        .info-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--primary-color);
+            min-width: 120px;
+        }
+
+        .info-value {
+            color: var(--text-primary);
+            word-break: break-all;
+        }
+
+        .link-group {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .link-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .link-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(0, 112, 243, 0.2);
+            border: 1px solid var(--primary-color);
+            border-radius: 8px;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .link-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            background: rgba(239, 68, 68, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            border-left: 4px solid var(--error-color);
+            margin: 1rem 0;
+        }
+
+        .success-message {
+            color: var(--accent-color);
+            background: rgba(16, 185, 129, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            border-left: 4px solid var(--accent-color);
+            margin: 1rem 0;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .title {
+                font-size: 2rem;
+            }
+
+            .input-section {
+                padding: 1.5rem;
+            }
+
+            .progress-stats {
+                justify-content: center;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .link-buttons {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">
+                <i class="fas fa-satellite-dish"></i>
+                IPTV Checker Pro
+            </h1>
+            <p class="subtitle">Verificador profissional de listas M3U com análise completa</p>
+        </header>
+
+        <section class="input-section">
+            <div class="input-group">
+                <label for="urlInput" class="input-label">
+                    <i class="fas fa-link"></i>
+                    URLs das Listas M3U
+                </label>
+                <textarea 
+                    id="urlInput" 
+                    class="input-field textarea-field" 
+                    placeholder="Cole aqui as URLs das suas listas M3U (uma por linha)&#10;&#10;Exemplo:&#10;http://exemplo.com:8080/get.php?username=user&password=pass&type=m3u_plus&#10;http://outro.exemplo.com/playlist.m3u"
+                    rows="6"
+                ></textarea>
+            </div>
+            
+            <button id="checkBtn" class="btn btn-full">
+                <i class="fas fa-play"></i>
+                <span>Iniciar Verificação</span>
+            </button>
+        </section>
+
+        <section id="progressSection" class="progress-section hidden">
+            <div class="progress-container">
+                <div class="progress-info">
+                    <h3><i class="fas fa-chart-line"></i> Progresso da Verificação</h3>
+                    <div class="progress-stats">
+                        <div class="stat-item">
+                            <span id="liveCounter" class="stat-number">0</span>
+                            <span class="stat-label">Canais</span>
+                        </div>
+                        <div class="stat-item">
+                            <span id="seriesCounter" class="stat-number">0</span>
+                            <span class="stat-label">Séries</span>
+                        </div>
+                        <div class="stat-item">
+                            <span id="vodCounter" class="stat-number">0</span>
+                            <span class="stat-label">Filmes</span>
+                        </div>
+                        <div class="stat-item">
+                            <span id="timeCounter" class="stat-number">0s</span>
+                            <span class="stat-label">Tempo</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="progress-bar-container">
+                    <div id="progressBar" class="progress-bar" style="width: 0%"></div>
+                </div>
+                <div style="text-align: center; margin-top: 1rem; color: var(--text-secondary);">
+                    <span id="progressText">Preparando verificação...</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="resultsSection" class="results-section">
+            <!-- Resultados serão inseridos aqui dinamicamente -->
+        </section>
+    </div>
+
+    <script>
+        class IPTVChecker {
+            constructor() {
+                this.checkBtn = document.getElementById('checkBtn');
+                this.urlInput = document.getElementById('urlInput');
+                this.progressSection = document.getElementById('progressSection');
+                this.resultsSection = document.getElementById('resultsSection');
+                this.progressBar = document.getElementById('progressBar');
+                this.progressText = document.getElementById('progressText');
+                
+                this.counters = {
+                    live: document.getElementById('liveCounter'),
+                    series: document.getElementById('seriesCounter'),
+                    vod: document.getElementById('vodCounter'),
+                    time: document.getElementById('timeCounter')
+                };
+
+                this.totals = { live: 0, series: 0, vod: 0 };
+                this.startTime = null;
+                this.timeInterval = null;
+
+                this.init();
+            }
+
+            init() {
+                this.checkBtn.addEventListener('click', () => this.startCheck());
+                
+                // Auto-resize textarea
+                this.urlInput.addEventListener('input', () => {
+                    this.urlInput.style.height = 'auto';
+                    this.urlInput.style.height = this.urlInput.scrollHeight + 'px';
+                });
+            }
+
+            async startCheck() {
+                const urls = this.urlInput.value.trim().split('\n').filter(url => url.trim());
+                
+                if (urls.length === 0) {
+                    this.showError('Por favor, insira pelo menos uma URL válida.');
+                    return;
+                }
+
+                this.resetCheck();
+                this.showProgress();
+                this.startTimer();
+
+                for (let i = 0; i < urls.length; i++) {
+                    const url = urls[i].trim();
+                    if (url) {
+                        await this.checkSingleURL(url, i + 1, urls.length);
+                    }
+                }
+
+                this.finishCheck();
+            }
+
+            resetCheck() {
+                this.totals = { live: 0, series: 0, vod: 0 };
+                this.resultsSection.innerHTML = '';
+                this.updateCounters();
+                this.checkBtn.disabled = true;
+                this.checkBtn.innerHTML = '<span class="loading-spinner"></span> Verificando...';
+            }
+
+            showProgress() {
+                this.progressSection.classList.remove('hidden');
+                this.progressSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            startTimer() {
+                this.startTime = Date.now();
+                this.timeInterval = setInterval(() => {
+                    const elapsed = Math.floor((Date.now() - this.startTime) / 1000);
+                    this.counters.time.textContent = elapsed + 's';
+                }, 1000);
+            }
+
+            async checkSingleURL(url, current, total) {
+                try {
+                    this.updateProgress(current, total, `Verificando ${current}/${total}: Extraindo dados...`);
+                    
+                    const urlObj = new URL(url);
+                    const params = new URLSearchParams(urlObj.search);
+                    const username = params.get('username');
+                    const password = params.get('password');
+
+                    if (!username || !password) {
+                        throw new Error('URL inválida: username/password não encontrados');
+                    }
+
+                    const host = urlObj.hostname;
+                    const port = urlObj.port || '';
+                    const baseURL = `http://${host}${port ? ':' + port : ''}`;
+                    const apiBase = `${baseURL}/player_api.php?username=${username}&password=${password}`;
+
+                    // Fazer requisições em paralelo para maior eficiência
+                    const [userInfo, liveStreams, series, vodStreams] = await Promise.all([
+                        this.fetchWithTimeout(`${apiBase}`),
+                        this.fetchWithTimeout(`${apiBase}&action=get_live_streams`),
+                        this.fetchWithTimeout(`${apiBase}&action=get_series`),
+                        this.fetchWithTimeout(`${apiBase}&action=get_vod_streams`)
+                    ]);
+
+                    this.updateProgress(current, total, `Verificando ${current}/${total}: Processando dados...`);
+
+                    const result = {
+                        url,
+                        username,
+                        password,
+                        host,
+                        port,
+                        baseURL,
+                        userInfo: userInfo.user_info,
+                        serverInfo: userInfo.server_info,
+                        counts: {
+                            live: liveStreams?.length || 0,
+                            series: series?.length || 0,
+                            vod: vodStreams?.length || 0
+                        }
+                    };
+
+                    this.totals.live += result.counts.live;
+                    this.totals.series += result.counts.series;
+                    this.totals.vod += result.counts.vod;
+
+                    this.updateCounters();
+                    this.renderResult(result);
+
+                } catch (error) {
+                    console.error('Erro ao verificar URL:', error);
+                    this.renderError(url, error.message);
+                }
+            }
+
+            async fetchWithTimeout(url, timeout = 10000) {
+                const controller = new AbortController();
+                const id = setTimeout(() => controller.abort(), timeout);
+                
+                try {
+                    const response = await fetch(url, { 
+                        signal: controller.signal,
+                        mode: 'cors'
+                    });
+                    clearTimeout(id);
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    return await response.json();
+                } catch (error) {
+                    clearTimeout(id);
+                    if (error.name === 'AbortError') {
+                        throw new Error('Timeout: Servidor não respondeu em 10 segundos');
+                    }
+                    throw error;
+                }
+            }
+
+            updateProgress(current, total, text) {
+                const percentage = (current / total) * 100;
+                this.progressBar.style.width = percentage + '%';
+                this.progressText.textContent = text;
+            }
+
+            updateCounters() {
+                this.counters.live.textContent = this.totals.live.toLocaleString();
+                this.counters.series.textContent = this.totals.series.toLocaleString();
+                this.counters.vod.textContent = this.totals.vod.toLocaleString();
+            }
+
+            renderResult(result) {
+                const { userInfo, serverInfo, counts } = result;
+                
+                if (!userInfo || userInfo.status !== 'Active') {
+                    this.renderError(result.url, 'Conta inativa ou dados inválidos');
+                    return;
+                }
+
+                const card = document.createElement('div');
+                card.className = 'result-card fade-in';
+                
+                const createdDate = new Date(userInfo.created_at * 1000).toLocaleString('pt-BR');
+                const expDate = new Date(userInfo.exp_date * 1000).toLocaleString('pt-BR');
+                const timeNow = serverInfo.time_now ? new Date(serverInfo.time_now * 1000).toLocaleString('pt-BR') : 'N/A';
+
+                const formats = userInfo.allowed_output_formats || ['m3u8'];
+                const formatLinks = formats.map(format => 
+                    `<a href="${result.baseURL}/player_api.php?username=${result.username}&password=${result.password}&format=${format}" target="_blank" class="link-btn">
+                        <i class="fas fa-download"></i> ${format.toUpperCase()}
+                    </a>`
+                ).join('');
+
+                card.innerHTML = `
+                    <div class="result-header">
+                        <div class="status-badge status-active">
+                            <i class="fas fa-check-circle"></i>
+                            ATIVO
+                        </div>
+                        <h3><i class="fas fa-server"></i> ${result.host}</h3>
+                    </div>
+
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <i class="fas fa-user info-label"></i>
+                            <span class="info-label">Usuário:</span>
+                            <span class="info-value">${result.username}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-key info-label"></i>
+                            <span class="info-label">Senha:</span>
+                            <span class="info-value">${result.password}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-calendar-plus info-label"></i>
+                            <span class="info-label">Criado em:</span>
+                            <span class="info-value">${createdDate}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-calendar-times info-label"></i>
+                            <span class="info-label">Expira em:</span>
+                            <span class="info-value">${expDate}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-users info-label"></i>
+                            <span class="info-label">Conexões:</span>
+                            <span class="info-value">${userInfo.active_cons}/${userInfo.max_connections}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-clock info-label"></i>
+                            <span class="info-label">Hora do servidor:</span>
+                            <span class="info-value">${timeNow}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-tv info-label"></i>
+                            <span class="info-label">Canais:</span>
+                            <span class="info-value">${counts.live.toLocaleString()}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-film info-label"></i>
+                            <span class="info-label">Filmes:</span>
+                            <span class="info-value">${counts.vod.toLocaleString()}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-video info-label"></i>
+                            <span class="info-label">Séries:</span>
+                            <span class="info-value">${counts.series.toLocaleString()}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-network-wired info-label"></i>
+                            <span class="info-label">Porta:</span>
+                            <span class="info-value">${serverInfo.port || 'N/A'}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-shield-alt info-label"></i>
+                            <span class="info-label">HTTPS:</span>
+                            <span class="info-value">${serverInfo.https_port || 'N/A'}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-globe info-label"></i>
+                            <span class="info-label">Timezone:</span>
+                            <span class="info-value">${serverInfo.timezone || 'N/A'}</span>
+                        </div>
+                    </div>
+
+                    <div class="link-group">
+                        <h4><i class="fas fa-download"></i> Downloads e Acesso</h4>
+                        <div class="link-buttons">
+                            ${formatLinks}
+                            <a href="http://${result.host}/client_area/index.php?username=${result.username}&password=${result.password}&submit" target="_blank" class="link-btn">
+                                <i class="fas fa-external-link-alt"></i> Painel
+                            </a>
+                        </div>
+                    </div>
+                `;
+
+                this.resultsSection.appendChild(card);
+            }
+
+            renderError(url, error) {
+                const card = document.createElement('div');
+                card.className = 'result-card fade-in';
+                
+                card.innerHTML = `
+                    <div class="result-header">
+                        <div class="status-badge status-error">
+                            <i class="fas fa-times-circle"></i>
+                            ERRO
+                        </div>
+                        <h3><i class="fas fa-exclamation-triangle"></i> Falha na verificação</h3>
+                    </div>
+                    <div class="error-message">
+                        <strong>URL:</strong> ${url}<br>
+                        <strong>Erro:</strong> ${error}
+                    </div>
+                `;
+
+                this.resultsSection.appendChild(card);
+            }
+
+            showError(message) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message fade-in';
+                errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${message}`;
+                
+                this.resultsSection.innerHTML = '';
+                this.resultsSection.appendChild(errorDiv);
+            }
+
+            finishCheck() {
+                clearInterval(this.timeInterval);
+                this.checkBtn.disabled = false;
+                this.checkBtn.innerHTML = '<i class="fas fa-play"></i> <span>Iniciar Verificação</span>';
+                this.progressText.textContent = 'Verificação concluída!';
+                
+                const successMsg = document.createElement('div');
+                successMsg.className = 'success-message fade-in';
+                successMsg.innerHTML = `
+                    <i class="fas fa-check-circle"></i> 
+                    <strong>Verificação concluída com sucesso!</strong><br>
+                    Total encontrado: ${this.totals.live.toLocaleString()} canais, ${this.totals.series.toLocaleString()} séries, ${this.totals.vod.toLocaleString()} filmes
+                `;
+                
+                this.resultsSection.insertBefore(successMsg, this.resultsSection.firstChild);
+            }
+        }
+
+        // Inicializar a aplicação quando o DOM estiver carregado
+        document.addEventListener('DOMContentLoaded', () => {
+            new IPTVChecker();
+        });
+    </script>
+</body>
+</html>
