@@ -107,11 +107,11 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-image: url('https://i.imgur.com/YQZEVGt.gif');
+            background-image: url('https://media.giphy.com/media/26tn33aiTi1jkl6H6/giphy.gif');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            opacity: 0.03;
+            opacity: 0.05;
             z-index: -1;
             pointer-events: none;
             transition: all 0.5s ease;
@@ -1288,13 +1288,20 @@ http://outro.exemplo.com/playlist.m3u"
                 applyBackgroundBtn.addEventListener('click', () => {
                     const url = backgroundInput.value.trim();
                     if (url) {
-                        document.body.style.setProperty('--custom-background', `url(${url})`);
-                        document.body.style.setProperty('--background-opacity', '0.05');
+                        // Remove estilos anteriores
+                        const oldStyle = document.getElementById('custom-background-style');
+                        if (oldStyle) oldStyle.remove();
+                        
+                        // Aplica novo fundo
                         const style = document.createElement('style');
+                        style.id = 'custom-background-style';
                         style.textContent = `
                             body::after {
-                                background-image: var(--custom-background) !important;
-                                opacity: var(--background-opacity) !important;
+                                background-image: url(${url}) !important;
+                                opacity: 0.05 !important;
+                                background-size: cover !important;
+                                background-position: center !important;
+                                background-repeat: no-repeat !important;
                             }
                         `;
                         document.head.appendChild(style);
@@ -1335,7 +1342,19 @@ http://outro.exemplo.com/playlist.m3u"
 
                 if (savedBackground) {
                     document.getElementById('backgroundInput').value = savedBackground;
-                    document.getElementById('applyBackgroundBtn').click();
+                    // Aplica o fundo salvo automaticamente
+                    const style = document.createElement('style');
+                    style.id = 'custom-background-style';
+                    style.textContent = `
+                        body::after {
+                            background-image: url(${savedBackground}) !important;
+                            opacity: 0.05 !important;
+                            background-size: cover !important;
+                            background-position: center !important;
+                            background-repeat: no-repeat !important;
+                        }
+                    `;
+                    document.head.appendChild(style);
                 }
             }
 
@@ -1408,10 +1427,25 @@ http://outro.exemplo.com/playlist.m3u"
             }
 
             async startCheck() {
-                const urls = this.urlInput.value.trim().split('\n').filter(url => url.trim());
+                let urls = this.urlInput.value.trim().split('\n').filter(url => url.trim());
                 
                 if (urls.length === 0) {
                     this.showToast('Por favor, insira pelo menos uma URL!', 'error');
+                    return;
+                }
+
+                // Filtra apenas URLs válidas de IPTV
+                urls = urls.filter(url => {
+                    try {
+                        const urlObj = new URL(url);
+                        return url.includes('username=') && url.includes('password=');
+                    } catch {
+                        return false;
+                    }
+                });
+
+                if (urls.length === 0) {
+                    this.showToast('Nenhuma URL válida de IPTV encontrada!', 'error');
                     return;
                 }
 
@@ -1428,15 +1462,19 @@ http://outro.exemplo.com/playlist.m3u"
                 const results = [];
                 let completed = 0;
 
+                // Verifica cada URL filtrada individualmente
                 for (const [index, url] of urls.entries()) {
                     try {
-                        this.updateProgress(completed, urls.length, `Verificando lista ${index + 1}/${urls.length}...`);
+                        this.updateProgress(completed, urls.length, `Verificando lista ${index + 1}/${urls.length}: ${url.substring(0, 50)}...`);
                         
                         const result = await this.checkSinglePlaylist(url.trim());
                         results.push(result);
                         
                         this.updateTotals(result);
                         completed++;
+                        
+                        // Pequena pausa entre requisições para evitar sobrecarga
+                        await new Promise(resolve => setTimeout(resolve, 500));
                         
                     } catch (error) {
                         console.error(`Erro ao verificar ${url}:`, error);
@@ -1446,7 +1484,8 @@ http://outro.exemplo.com/playlist.m3u"
                             error: error.message,
                             live: 0,
                             series: 0,
-                            vod: 0
+                            vod: 0,
+                            responseTime: 0
                         });
                         completed++;
                     }
@@ -1456,7 +1495,7 @@ http://outro.exemplo.com/playlist.m3u"
                 clearInterval(this.timeInterval);
                 this.displayResults(results);
                 this.enableButton();
-                this.showToast(`Verificação concluída! ${results.length} listas analisadas.`, 'success');
+                this.showToast(`Verificação concluída! ${results.length} listas analisadas, ${results.filter(r => r.status === 'success').length} funcionando.`, 'success');
             }
 
             async checkSinglePlaylist(url) {
